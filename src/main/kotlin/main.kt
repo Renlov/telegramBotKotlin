@@ -2,6 +2,7 @@ import Networking.client
 import dev.inmo.tgbotapi.bot.Ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.send.reply
+import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.requests.send.SendTextMessage
@@ -18,14 +19,15 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
 suspend fun main() {
-    val bot = telegramBot("bot token")
+    val bot = telegramBot("5368599889:AAHMGBROXto1fsOLpM4kikjnaALLjA_c8ww")
     bot.buildBehaviourWithLongPolling {
         println(getMe())
-
         onCommand("apps") {
-            reply(it, "Ищу...")
+            bot.sendMessage(it.chat, "Ищу...")
             val apps = getApps()
-            reply(it, "$apps")
+            apps.forEach{app->
+                bot.sendMessage(it.chat, app.toString())
+            }
         }
     }.join()
 }
@@ -43,7 +45,7 @@ suspend fun getApps() = withContext(Dispatchers.IO)
 
 object Networking {
     val client = HttpClient(CIO) {
-        // install(Logging)
+        install(Logging)
         install(JsonFeature) {
             serializer = KotlinxSerializer()
         }
