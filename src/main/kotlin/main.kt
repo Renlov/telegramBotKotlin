@@ -8,6 +8,12 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitText
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.requests.send.SendTextMessage
+import dev.inmo.tgbotapi.types.buttons.KeyboardButton
+import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardMarkup
+import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardRemove
+import dev.inmo.tgbotapi.types.buttons.SimpleKeyboardButton
+import dev.inmo.tgbotapi.utils.matrix
+import dev.inmo.tgbotapi.utils.row
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.json.*
@@ -18,6 +24,9 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.awt.Button
+import java.util.*
+import kotlin.collections.ArrayList
 
 suspend fun main() {
     val bot = telegramBot("5368599889:AAHMGBROXto1fsOLpM4kikjnaALLjA_c8ww")
@@ -46,37 +55,64 @@ suspend fun main() {
         }
 
         onCommand("post"){
-            val text = waitText(
-                SendTextMessage(
-                    it.chat.id,
-                    "fill this form\n\n\"bundle\":\"\",\n" +
-                            "\"appName\":\"\",\n" +
-                            "\"source\":\"\",\n" +
-                            "\"appsFlyer\":\"\",\n" +
-                            "\"fb\":\"\""
-                )
+            val arrayList = ArrayList<String>()
+
+            val nameReplyMarkup = ReplyKeyboardMarkup(
+                matrix {
+                    row {
+                        +SimpleKeyboardButton("Пропустить")
+                    }
+                }
             )
-            val app = App(text[0].text, text[1].text, text[3].text, text[4].text, text[5].text)
-            println(text[0].text)
-            println(text.first().text)
+
+            val bundle = waitText(
+                SendTextMessage(
+                    it.chat.id, "Bundle, like\ncom.opple.entel")
+            )
+            arrayList.add(bundle[0].text)
+
+            val name = waitText(
+                SendTextMessage(
+                    it.chat.id, "App name, like\nSoul of Apis")
+            )
+            arrayList.add(name[0].text)
+
+            val link = waitText(
+                SendTextMessage(
+                    it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup)
+            ).first().text.takeIf { it != "Пропустить"}
+            if (link !=null){
+                arrayList.add(link)
+            }else arrayList.add("")
+
+            val apps = waitText(
+                SendTextMessage(
+                    it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup)
+            ).first().text.takeIf { it != "Пропустить"}
+            if (apps != null){
+                arrayList.add(apps)
+            }else arrayList.add("")
+
+            val fb = waitText(
+                SendTextMessage(
+                    it.chat.id, "FaceBook, like\n1349989478796692", replyMarkup = nameReplyMarkup)
+            ).first().text.takeIf { it != "Пропустить"}
+            if (fb !=null){
+                arrayList.add(fb)
+            }else arrayList.add("")
+            val app = App(arrayList[0],arrayList[1],arrayList[2],arrayList[3],arrayList[4])
             postCurrentApp(app)
+
+            bot.sendMessage(it.chat, "Done\n$app", replyMarkup = ReplyKeyboardRemove(false))
         }
     }.join()
 }
-
 suspend fun postCurrentApp(app : App) = withContext(Dispatchers.IO){
     try {
-        val formData = Parameters.build {
-            append("bundle", app.bundle)
-            append("appName", app.appName)
-            append("source", app.source?:"")
-            append("appsFlyer", app.appsFlyer?:"")
-            append("fb", app.fb?:"")
-        }
-
-        val data : String = client.submitForm("https://grey-source.herokuapp.com/add_app", formData.toString(), encodeInQuery = true)
-        print(data)
-        //client.post<App>("https://grey-source.herokuapp.com/add_app")
+       client.post<App>("https://grey-source.herokuapp.com/add_app"){
+           contentType(ContentType.Application.Json)
+           body = app
+       }
     }catch (e : Exception){
         println(e)
     }
