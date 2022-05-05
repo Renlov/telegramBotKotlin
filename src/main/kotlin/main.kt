@@ -54,7 +54,7 @@ suspend fun main() {
 
         }
 
-        onCommand("post"){
+        onCommand("put"){
             val arrayList = ArrayList<String>()
 
             val nameReplyMarkup = ReplyKeyboardMarkup(
