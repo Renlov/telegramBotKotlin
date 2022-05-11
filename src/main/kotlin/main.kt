@@ -1,17 +1,27 @@
 import Networking.client
 import dev.inmo.tgbotapi.bot.Ktor.telegramBot
+import dev.inmo.tgbotapi.extensions.api.answers.answerInlineQuery
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
+import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitInlineMessageIdCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitText
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.row
 import dev.inmo.tgbotapi.requests.send.SendTextMessage
+import dev.inmo.tgbotapi.types.CallbackQuery.InlineMessageIdCallbackQuery
+import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.PayInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.KeyboardButton
 import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardMarkup
 import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardRemove
 import dev.inmo.tgbotapi.types.buttons.SimpleKeyboardButton
+import dev.inmo.tgbotapi.types.inlineKeyboardField
+import dev.inmo.tgbotapi.types.inlineMessageIdField
+import dev.inmo.tgbotapi.types.payloadField
 import dev.inmo.tgbotapi.utils.matrix
 import dev.inmo.tgbotapi.utils.row
 import io.ktor.client.*
@@ -35,12 +45,26 @@ suspend fun main() {
         println(getMe())
 
         onCommand("apps") {
-            bot.sendMessage(it.chat, "Ищу...")
+            bot.sendMessage(it.chat, "wait...")
             val apps = getApps()
             apps.forEach{app->
                 bot.sendMessage(it.chat, app.toString())
             }
         }
+
+        onCommand("test"){
+            bot.sendTextMessage(it.chat, "message", replyMarkup = inlineKeyboard {
+                row {
+                    includePageButtons()
+                }
+            }).text.takeIf { it == "Url" }
+
+
+            val a = waitInlineMessageIdCallbackQuery {
+               it.text
+            }
+        }
+
 
         onCommand("search"){
             val text = waitText(
@@ -55,7 +79,7 @@ suspend fun main() {
         }
 
         onCommand("put"){
-            val arrayList = ArrayList<String>()
+            val arrayList = ArrayList<String?>()
 
             val nameReplyMarkup = ReplyKeyboardMarkup(
                 matrix {
@@ -83,7 +107,7 @@ suspend fun main() {
             ).first().text.takeIf { it != "Пропустить"}
             if (link !=null){
                 arrayList.add(link)
-            }else arrayList.add("")
+            }else arrayList.add(null)
 
             val apps = waitText(
                 SendTextMessage(
@@ -91,16 +115,16 @@ suspend fun main() {
             ).first().text.takeIf { it != "Пропустить"}
             if (apps != null){
                 arrayList.add(apps)
-            }else arrayList.add("")
+            }else arrayList.add(null)
 
-            val fb = waitText(
+            val deepLink = waitText(
                 SendTextMessage(
-                    it.chat.id, "FaceBook, like\n1349989478796692", replyMarkup = nameReplyMarkup)
+                    it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup)
             ).first().text.takeIf { it != "Пропустить"}
-            if (fb !=null){
-                arrayList.add(fb)
-            }else arrayList.add("")
-            val app = App(arrayList[0],arrayList[1],arrayList[2],arrayList[3],arrayList[4])
+            if (deepLink !=null){
+                arrayList.add(deepLink)
+            }else arrayList.add(null)
+            val app = App(arrayList[0]!!,arrayList[1]!!,arrayList[2],arrayList[3],arrayList[4])
             postCurrentApp(app)
 
             bot.sendMessage(it.chat, "Done\n$app", replyMarkup = ReplyKeyboardRemove(false))
@@ -143,4 +167,20 @@ object Networking {
             serializer = KotlinxSerializer()
         }
     }
+}
+
+fun InlineKeyboardBuilder.includePageButtons() {
+    val numericButtons = listOfNotNull(
+        "Url",
+        "AppsFlyer",
+        "DeepLink",
+    )
+
+    row {
+        numericButtons.forEach {
+            dataButton(it, it)
+        }
+    }
+
+
 }
