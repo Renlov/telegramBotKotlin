@@ -18,10 +18,6 @@ repositories {
     }
 }
 
-tasks.create("stage") {
-    dependsOn("installDist")
-}
-
 dependencies {
     testImplementation(kotlin("test"))
     implementation ("dev.inmo:tgbotapi:0.38.21")
@@ -44,4 +40,8 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.create("stage") {
+    dependsOn("installDist")
 }
