@@ -18,6 +18,10 @@ repositories {
     }
 }
 
+tasks.create("stage") {
+    dependsOn("installDist")
+}
+
 dependencies {
     testImplementation(kotlin("test"))
     implementation ("dev.inmo:tgbotapi:0.38.21")
