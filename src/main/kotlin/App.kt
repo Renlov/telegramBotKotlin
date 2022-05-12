@@ -2,9 +2,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class App(
-    val bundle: String,
-    val appName: String,
-    val source: String? = null,
-    val appsFlyer: String? = null,
-    val fb: String? = null
+    var bundle: String,
+    var appName: String,
+    var source: String? = null,
+    var appsFlyer: String? = null,
+    var fb: String? = null
 )

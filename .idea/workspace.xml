@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="39bb3a94-f7bd-48ec-a622-22d38bb97ff0" name="Changes" comment="added search and try todo postCurrentApp">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/App.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/App.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/main.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -97,7 +98,14 @@
       <option name="project" value="LOCAL" />
       <updated>1651763897952</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added search and try todo postCurrentApp">
+      <created>1651764103960</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1651764103960</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -114,5 +122,20 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added search and try todo postCurrentApp" />
     <option name="LAST_COMMIT_MESSAGE" value="added search and try todo postCurrentApp" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-function">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/main.kt</url>
+          <line>188</line>
+          <properties method="addApp">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
