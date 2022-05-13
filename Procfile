@@ -1,1 +1,1 @@
-web: ./build/install/telegrambot/bin/telegrambot
+web: ./build/install/telegramBotKotlin/bin/telegramBotKotlin
