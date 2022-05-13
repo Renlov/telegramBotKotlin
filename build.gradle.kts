@@ -4,6 +4,7 @@ val coroutinesVersion = "1.6.1"
 val ktor_version = "1.6.8"
 
 plugins {
+    application
     kotlin("jvm") version "1.6.20"
     kotlin("plugin.serialization") version "1.4.21"
 }
@@ -21,6 +22,10 @@ sourceSets {
 group = "com.sometime"
 version = "1.0-SNAPSHOT"
 
+application{
+    mainClass.set("mainKt")
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -37,6 +42,7 @@ dependencies {
 
     implementation ("io.ktor:ktor-client-core:$ktor_version")
     implementation ("io.ktor:ktor-client-cio:$ktor_version")
+    implementation ("io.ktor:ktor-server-netty:2.0.1")
     implementation ("io.ktor:ktor-client-serialization:$ktor_version")
     implementation ("io.ktor:ktor-client-websockets:$ktor_version")
     implementation ("io.ktor:ktor-client-logging:$ktor_version")

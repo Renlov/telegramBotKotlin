@@ -28,8 +28,6 @@ import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import ConstValue.Companion.BUNDLE
 import ConstValue.Companion.DEEPLINK
 import ConstValue.Companion.NEXT
@@ -39,38 +37,33 @@ import ConstValue.Companion.nameReplyMarkup
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
+import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
     val bot = telegramBot(TOKEN)
-
     bot.buildBehaviourWithLongPolling {
         println(getMe())
-
         onCommand("apps") {
             bot.sendMessage(it.chat, "wait...")
             val apps = getApps()
-            apps.forEach{ app->
+            apps.forEach { app ->
                 bot.sendMessage(it.chat, appToString(app))
             }
         }
-
-        onCommand("search"){ onCommandChat->
+        onCommand("search") { onCommandChat ->
             val searchBundle = waitText(
                 SendTextMessage(
                     onCommandChat.chat.id,
-                "input $BUNDLE"
+                    "input $BUNDLE"
                 )
             )
-
-            val findApp : App = getCurrentApp(searchBundle.first().text) as App
-
+            val findApp: App = getCurrentApp(searchBundle.first().text) as App
             bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
                 row {
                     includePageButtons()
                 }
             })
-
             onMessageDataCallbackQuery {
                 val name = it.data
                 editMessageText(
@@ -87,53 +80,51 @@ suspend fun main() {
                 bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
             }
         }
-
-        onCommand("put"){
+        onCommand("put") {
             val arrayList = ArrayList<String?>()
-
             val bundle = waitText(
                 SendTextMessage(
-                    it.chat.id, "Bundle, like\ncom.opple.entel")
+                    it.chat.id, "Bundle, like\ncom.opple.entel"
+                )
             )
             arrayList.add(bundle[0].text)
-
             val name = waitText(
                 SendTextMessage(
-                    it.chat.id, "App name, like\nSoul of Apis")
+                    it.chat.id, "App name, like\nSoul of Apis"
+                )
             )
             arrayList.add(name[0].text)
-
             val link = waitText(
                 SendTextMessage(
-                    it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup)
-            ).first().text.takeIf { it != NEXT}
-            if (link !=null){
+                    it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
+                )
+            ).first().text.takeIf { it != NEXT }
+            if (link != null) {
                 arrayList.add(link)
-            }else arrayList.add(null)
-
+            } else arrayList.add(null)
             val apps = waitText(
                 SendTextMessage(
-                    it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup)
-            ).first().text.takeIf { it != NEXT}
-            if (apps != null){
+                    it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
+                )
+            ).first().text.takeIf { it != NEXT }
+            if (apps != null) {
                 arrayList.add(apps)
-            }else arrayList.add(null)
-
+            } else arrayList.add(null)
             val deepLink = waitText(
                 SendTextMessage(
-                    it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup)
-            ).first().text.takeIf { it != NEXT}
-            if (deepLink !=null){
+                    it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
+                )
+            ).first().text.takeIf { it != NEXT }
+            if (deepLink != null) {
                 arrayList.add(deepLink)
-            }else arrayList.add(null)
-
-            val app = App(arrayList[0]!!,arrayList[1]!!,arrayList[2],arrayList[3],arrayList[4])
+            } else arrayList.add(null)
+            val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
             postCurrentApp(app)
-
             bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
         }
     }.join()
 }
+
 suspend fun postCurrentApp(app : App) = withContext(Dispatchers.IO){
     try {
        client.post<App>("https://grey-source.herokuapp.com/add_app"){
