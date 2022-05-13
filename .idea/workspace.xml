@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39bb3a94-f7bd-48ec-a622-22d38bb97ff0" name="Changes" comment="added inline button">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_05_2022_13_19__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_05_2022_13_19__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_05_2022_9_54__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13_05_2022_9_54__Changes_.xml" afterDir="false" />
+    <list default="true" id="39bb3a94-f7bd-48ec-a622-22d38bb97ff0" name="Changes" comment="add change data">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/main.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -118,7 +115,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.telegrambot [assemble]">
+  <component name="RunManager" selected="Gradle.telegrambot [build]">
     <configuration name="telegramBotKotlin [stage]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -203,6 +200,19 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="telegramBotKotlin" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="telegramBotKotlin" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Dockerfile build" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
       <deployment type="dockerfile">
         <settings>
@@ -217,9 +227,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.telegrambot [build]" />
         <item itemvalue="Gradle.telegramBotKotlin [stage]" />
         <item itemvalue="Gradle.telegrambot [buildDependents]" />
-        <item itemvalue="Gradle.telegrambot [build]" />
         <item itemvalue="Gradle.telegrambot [assemble]" />
       </list>
     </recent_temporary>
@@ -366,7 +376,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652450684779</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="add change data">
+      <created>1652467050457</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1652467050457</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -382,8 +399,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added search and try todo postCurrentApp" />
-    <MESSAGE value="add change data" />
     <MESSAGE value="added inline button" />
-    <option name="LAST_COMMIT_MESSAGE" value="added inline button" />
+    <MESSAGE value="add change data" />
+    <option name="LAST_COMMIT_MESSAGE" value="add change data" />
   </component>
 </project>

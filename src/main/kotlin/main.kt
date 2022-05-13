@@ -40,12 +40,40 @@ import dev.inmo.tgbotapi.requests.webhook.SetWebhook
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
 import dev.inmo.tgbotapi.updateshandlers.FlowsUpdatesFilter
+import io.ktor.application.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
 import kotlinx.coroutines.*
+import org.apache.catalina.startup.Tomcat
 import java.util.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
-    println("loga")
+//    createKtorServer {
+//        routing {
+//            get {
+//                call.respond(HttpStatusCode.OK)
+//            }
+//        }
+//    }.start(true)
+    embeddedServer(
+        io.ktor.server.tomcat.Tomcat,
+        applicationEngineEnvironment {
+            module {
+                routing {
+                    get {
+                        call.respond(HttpStatusCode.OK)
+                    }
+                }
+            }
+            connector {
+                this.host = host
+                this.port = port
+            }
+        }
+    ).start(true)
+
     val bot = telegramBot(System.getenv("KEYTELEGRAM"))
     val scope = CoroutineScope(Dispatchers.IO)
     val filter = FlowsUpdatesFilter()
@@ -134,6 +162,7 @@ suspend fun main() {
             bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
         }
 
+
         val server = bot.setWebhookInfoAndStartListenWebhooks(
             System.getenv("PORT").toInt(),
             io.ktor.server.tomcat.Tomcat, SetWebhook(
@@ -151,7 +180,6 @@ suspend fun main() {
         server.environment.connectors.forEach{
             println(it)
         }
-        server.start(false)
     }
 
     scope.coroutineContext.job.join()
