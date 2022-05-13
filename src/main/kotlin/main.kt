@@ -59,7 +59,7 @@ suspend fun main() {
     server.environment.connectors.forEach{
         println(it)
     }
-    server.start(true)
+    server.start(false)
 
 
 
