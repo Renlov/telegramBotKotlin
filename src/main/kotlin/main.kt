@@ -33,14 +33,37 @@ import ConstValue.Companion.NEXT
 import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.utils.updates.flowsUpdatesFilter
+import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
+import dev.inmo.tgbotapi.requests.webhook.SetWebhook
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
 import kotlinx.coroutines.*
+import org.apache.catalina.startup.Tomcat
+import java.util.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
-        val bot = telegramBot(System.getenv("keyTelegram"))
-        bot.buildBehaviourWithLongPolling {
+        val bot = telegramBot(System.getenv("KEYTELEGRAM"))
+        val scope = CoroutineScope(Dispatchers.Default)
+    val subroute = UUID.randomUUID().toString()
+    val filter = flowsUpdatesFilter {
+    }
+
+
+    val server = bot.setWebhookInfoAndStartListenWebhooks(System.getenv("PORT").toInt(), io.ktor.server.tomcat.Tomcat, SetWebhook(
+        "https://telegrambotgrey.herokuapp.com/$subroute", allowedUpdates = filter.allowedUpdates), {
+
+    }, "0.0.0.0", subroute, scope = scope, block = filter.asUpdateReceiver)
+
+    server.environment.connectors.forEach{
+        println(it)
+    }
+    server.start(true)
+
+
+
+       bot.buildBehaviourWithLongPolling {
             println(getMe())
             onCommand("apps") {
                 bot.sendMessage(it.chat, "wait...")

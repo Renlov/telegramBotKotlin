@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="39bb3a94-f7bd-48ec-a622-22d38bb97ff0" name="Changes" comment="added inline button">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/main.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -87,7 +88,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.telegramBotKotlin [clean]">
+  <component name="RunManager" selected="Kotlin.MainKt (2)">
     <configuration name="telegramBotKotlin [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -167,10 +168,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Kotlin.MainKt (2)" />
         <item itemvalue="Gradle.telegramBotKotlin [clean]" />
         <item itemvalue="Gradle.telegramBotKotlin [stage2]" />
         <item itemvalue="Gradle.telegramBotKotlin [stage]" />
-        <item itemvalue="Kotlin.MainKt (2)" />
         <item itemvalue="Kotlin.MainKt (1)" />
       </list>
     </recent_temporary>
@@ -254,7 +255,21 @@
       <option name="project" value="LOCAL" />
       <updated>1652437209529</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="added inline button">
+      <created>1652438496424</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1652438496424</updated>
+    </task>
+    <task id="LOCAL-00012" summary="added inline button">
+      <created>1652438642417</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1652438642417</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
