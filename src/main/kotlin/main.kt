@@ -272,7 +272,7 @@ fun appToString(app: App): String {
 
 class ConstValue{
     companion object {
-        const val TOKEN = "5368599889:AAHMGBROXto1fsOLpM4kikjnaALLjA_c8ww"
+
         const val BUNDLE = "bundle"
         const val APP_NAME = "app name"
         const val URL = "url"
