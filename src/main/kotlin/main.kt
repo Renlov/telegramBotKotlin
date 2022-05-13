@@ -68,8 +68,8 @@ suspend fun main() {
                 }
             }
             connector {
-                this.host = host
-                this.port = port
+                this.host = "0.0.0.0"
+                this.port = System.getenv("PORT").toInt()
             }
         }
     ).start(true)
