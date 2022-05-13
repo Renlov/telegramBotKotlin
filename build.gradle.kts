@@ -23,7 +23,7 @@ group = "com.sometime"
 version = "1.0-SNAPSHOT"
 
 application{
-    mainClass.set("main")
+    mainClass.set("MainKt")
 }
 
 repositories {
