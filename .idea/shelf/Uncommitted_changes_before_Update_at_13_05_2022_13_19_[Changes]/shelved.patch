@@ -1,0 +1,409 @@
+Index: build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import org.jetbrains.kotlin.gradle.tasks.KotlinCompile\r\n\r\nval coroutinesVersion = \"1.6.1\"\r\nval ktor_version = \"1.6.8\"\r\n\r\nplugins {\r\n    application\r\n    kotlin(\"jvm\") version \"1.6.20\"\r\n    kotlin(\"plugin.serialization\") version \"1.4.21\"\r\n}\r\n\r\nbuildscript {\r\n    extra.set(\"kotlinVersion\", \"1.6.1\")\r\n}\r\n\r\nsourceSets {\r\n    main {\r\n        kotlin.sourceSets.create(\"kotlin\")\r\n    }\r\n}\r\n\r\ngroup = \"com.sometime\"\r\nversion = \"1.0-SNAPSHOT\"\r\n\r\napplication{\r\n    mainClass.set(\"mainKt\")\r\n}\r\n\r\nrepositories {\r\n    mavenCentral()\r\n    maven {\r\n        url = uri(\"https://maven.pkg.jetbrains.space/public/p/ktor/eap\")\r\n    }\r\n}\r\n\r\ndependencies {\r\n    testImplementation(kotlin(\"test\"))\r\n    implementation (\"dev.inmo:tgbotapi:0.38.21\")\r\n\r\n    implementation (\"org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion\")\r\n    implementation (\"org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion\")\r\n\r\n    implementation (\"io.ktor:ktor-client-core:$ktor_version\")\r\n    implementation (\"io.ktor:ktor-client-cio:$ktor_version\")\r\n    implementation (\"io.ktor:ktor-server-netty:2.0.1\")\r\n    implementation (\"io.ktor:ktor-client-serialization:$ktor_version\")\r\n    implementation (\"io.ktor:ktor-client-websockets:$ktor_version\")\r\n    implementation (\"io.ktor:ktor-client-logging:$ktor_version\")\r\n\r\n    implementation (\"org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2\")\r\n}\r\n\r\ntasks.test {\r\n    useJUnitPlatform()\r\n}\r\n\r\ntasks.withType<KotlinCompile> {\r\n    kotlinOptions.jvmTarget = \"1.8\"\r\n}\r\n\r\ntasks.create(\"stage\") {\r\n    dependsOn(\"build\")\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build.gradle.kts b/build.gradle.kts
+--- a/build.gradle.kts	(revision 6d272d050f40f9e2e1852a903970087bbbc51ef5)
++++ b/build.gradle.kts	(date 1652436172611)
+@@ -5,6 +5,7 @@
+ 
+ plugins {
+     application
++    java
+     kotlin("jvm") version "1.6.20"
+     kotlin("plugin.serialization") version "1.4.21"
+ }
+@@ -23,7 +24,7 @@
+ version = "1.0-SNAPSHOT"
+ 
+ application{
+-    mainClass.set("mainKt")
++    mainClass.set("main")
+ }
+ 
+ repositories {
+@@ -42,10 +43,8 @@
+ 
+     implementation ("io.ktor:ktor-client-core:$ktor_version")
+     implementation ("io.ktor:ktor-client-cio:$ktor_version")
+-    implementation ("io.ktor:ktor-server-netty:2.0.1")
+     implementation ("io.ktor:ktor-client-serialization:$ktor_version")
+     implementation ("io.ktor:ktor-client-websockets:$ktor_version")
+-    implementation ("io.ktor:ktor-client-logging:$ktor_version")
+ 
+     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+ }
+@@ -59,5 +58,5 @@
+ }
+ 
+ tasks.create("stage") {
+-    dependsOn("build")
++    dependsOn("application")
+ }
+\ No newline at end of file
+Index: src/main/kotlin/main.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import ConstValue.Companion.ALL\r\nimport ConstValue.Companion.APPSFLYER\r\nimport ConstValue.Companion.APP_NAME\r\nimport Networking.client\r\nimport dev.inmo.tgbotapi.bot.Ktor.telegramBot\r\nimport dev.inmo.tgbotapi.extensions.api.answers.answer\r\nimport dev.inmo.tgbotapi.extensions.api.bot.getMe\r\nimport dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText\r\nimport dev.inmo.tgbotapi.extensions.api.send.sendMessage\r\nimport dev.inmo.tgbotapi.extensions.api.send.sendTextMessage\r\nimport dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling\r\nimport dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitText\r\nimport dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand\r\nimport dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery\r\nimport dev.inmo.tgbotapi.extensions.utils.types.buttons.*\r\nimport dev.inmo.tgbotapi.extensions.utils.types.buttons.row\r\nimport dev.inmo.tgbotapi.extensions.utils.withContent\r\nimport dev.inmo.tgbotapi.requests.send.SendTextMessage\r\nimport dev.inmo.tgbotapi.types.buttons.ReplyKeyboardMarkup\r\nimport dev.inmo.tgbotapi.types.buttons.ReplyKeyboardRemove\r\nimport dev.inmo.tgbotapi.types.buttons.SimpleKeyboardButton\r\nimport dev.inmo.tgbotapi.utils.matrix\r\nimport dev.inmo.tgbotapi.utils.row\r\nimport io.ktor.client.*\r\nimport io.ktor.client.engine.cio.*\r\nimport io.ktor.client.features.json.*\r\nimport io.ktor.client.features.json.serializer.*\r\nimport io.ktor.client.features.logging.*\r\nimport io.ktor.client.request.*\r\nimport io.ktor.http.*\r\nimport ConstValue.Companion.BUNDLE\r\nimport ConstValue.Companion.DEEPLINK\r\nimport ConstValue.Companion.NEXT\r\nimport ConstValue.Companion.TOKEN\r\nimport ConstValue.Companion.URL\r\nimport ConstValue.Companion.nameReplyMarkup\r\nimport dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext\r\nimport dev.inmo.tgbotapi.types.message.abstracts.CommonMessage\r\nimport dev.inmo.tgbotapi.types.message.content.TextContent\r\nimport kotlinx.coroutines.*\r\nimport kotlin.collections.ArrayList\r\n\r\nsuspend fun main() {\r\n    val bot = telegramBot(TOKEN)\r\n    bot.buildBehaviourWithLongPolling {\r\n        println(getMe())\r\n        onCommand(\"apps\") {\r\n            bot.sendMessage(it.chat, \"wait...\")\r\n            val apps = getApps()\r\n            apps.forEach { app ->\r\n                bot.sendMessage(it.chat, appToString(app))\r\n            }\r\n        }\r\n        onCommand(\"search\") { onCommandChat ->\r\n            val searchBundle = waitText(\r\n                SendTextMessage(\r\n                    onCommandChat.chat.id,\r\n                    \"input $BUNDLE\"\r\n                )\r\n            )\r\n            val findApp: App = getCurrentApp(searchBundle.first().text) as App\r\n            bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {\r\n                row {\r\n                    includePageButtons()\r\n                }\r\n            })\r\n            onMessageDataCallbackQuery {\r\n                val name = it.data\r\n                editMessageText(\r\n                    it.message.withContent() ?: it.let {\r\n                        answer(it, \"Unsupported message type :(\")\r\n                        return@onMessageDataCallbackQuery },\r\n                    \"change $name on ${findApp.appName} app\",\r\n                    replyMarkup = inlineKeyboard {\r\n                    }\r\n                )\r\n                val changeData = waitText().first().text\r\n                changeDataApp(name, changeData, findApp)\r\n                replaceCurrentApp(findApp)\r\n                bot.sendMessage(onCommandChat.chat, \"Done ${appToString(findApp)}\")\r\n            }\r\n        }\r\n        onCommand(\"put\") {\r\n            val arrayList = ArrayList<String?>()\r\n            val bundle = waitText(\r\n                SendTextMessage(\r\n                    it.chat.id, \"Bundle, like\\ncom.opple.entel\"\r\n                )\r\n            )\r\n            arrayList.add(bundle[0].text)\r\n            val name = waitText(\r\n                SendTextMessage(\r\n                    it.chat.id, \"App name, like\\nSoul of Apis\"\r\n                )\r\n            )\r\n            arrayList.add(name[0].text)\r\n            val link = waitText(\r\n                SendTextMessage(\r\n                    it.chat.id, \"Url, like\\nhttps://www.dssm.us/21006Db01\", replyMarkup = nameReplyMarkup\r\n                )\r\n            ).first().text.takeIf { it != NEXT }\r\n            if (link != null) {\r\n                arrayList.add(link)\r\n            } else arrayList.add(null)\r\n            val apps = waitText(\r\n                SendTextMessage(\r\n                    it.chat.id, \"AppsFlyer, like\\nmciwvaFyjHeFMHFokEfuLE\", replyMarkup = nameReplyMarkup\r\n                )\r\n            ).first().text.takeIf { it != NEXT }\r\n            if (apps != null) {\r\n                arrayList.add(apps)\r\n            } else arrayList.add(null)\r\n            val deepLink = waitText(\r\n                SendTextMessage(\r\n                    it.chat.id, \"DeepLink, like\\n1349989478796692\", replyMarkup = nameReplyMarkup\r\n                )\r\n            ).first().text.takeIf { it != NEXT }\r\n            if (deepLink != null) {\r\n                arrayList.add(deepLink)\r\n            } else arrayList.add(null)\r\n            val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])\r\n            postCurrentApp(app)\r\n            bot.sendMessage(it.chat, \"Done\\n${appToString(app)}\", replyMarkup = ReplyKeyboardRemove(false))\r\n        }\r\n    }.join()\r\n}\r\n\r\nsuspend fun postCurrentApp(app : App) = withContext(Dispatchers.IO){\r\n    try {\r\n       client.post<App>(\"https://grey-source.herokuapp.com/add_app\"){\r\n           contentType(ContentType.Application.Json)\r\n           body = app\r\n       }\r\n    }catch (e : Exception){\r\n        println(e)\r\n    }\r\n}\r\n\r\nsuspend fun replaceCurrentApp(app: App) = withContext(Dispatchers.IO){\r\n    try {\r\n        client.post<App>(\"https://grey-source.herokuapp.com/replace_app\"){\r\n            contentType(ContentType.Application.Json)\r\n            body = app\r\n        }\r\n    }catch (e : Exception){\r\n        println(e)\r\n    }\r\n}\r\n\r\nsuspend fun getCurrentApp(bundle : String) = withContext(Dispatchers.IO){\r\n    try {\r\n        client.get<App>(\"https://grey-source.herokuapp.com/apps?search=$bundle\")\r\n    } catch (e : Exception) {\r\n        println(e)\r\n    }\r\n}\r\n\r\nsuspend fun getApps() = withContext(Dispatchers.IO)\r\n{\r\n    try {\r\n        client.get<List<App>>(\"https://grey-source.herokuapp.com/apps\")\r\n    } catch (e: Exception) {\r\n        println(e)\r\n        emptyList()\r\n    }\r\n}\r\n\r\nobject Networking {\r\n    val client = HttpClient(CIO) {\r\n        install(Logging)\r\n        install(JsonFeature) {\r\n            serializer = KotlinxSerializer()\r\n        }\r\n    }\r\n}\r\n\r\nsuspend fun BehaviourContext.addApp(it : CommonMessage<TextContent>){\r\n    val arrayList = ArrayList<String?>()\r\n\r\n    val bundle = waitText(\r\n        SendTextMessage(\r\n            it.chat.id, \"Bundle, like\\ncom.opple.entel\")\r\n    )\r\n    arrayList.add(bundle[0].text)\r\n\r\n    val name = waitText(\r\n        SendTextMessage(\r\n            it.chat.id, \"App name, like\\nSoul of Apis\")\r\n    )\r\n    arrayList.add(name[0].text)\r\n\r\n    val link = waitText(\r\n        SendTextMessage(\r\n            it.chat.id, \"Url, like\\nhttps://www.dssm.us/21006Db01\", replyMarkup = nameReplyMarkup)\r\n    ).first().text.takeIf { it != \"Пропустить\"}\r\n    if (link !=null){\r\n        arrayList.add(link)\r\n    }else arrayList.add(null)\r\n\r\n    val apps = waitText(\r\n        SendTextMessage(\r\n            it.chat.id, \"AppsFlyer, like\\nmciwvaFyjHeFMHFokEfuLE\", replyMarkup = nameReplyMarkup)\r\n    ).first().text.takeIf { it != \"Пропустить\"}\r\n    if (apps != null){\r\n        arrayList.add(apps)\r\n    }else arrayList.add(null)\r\n\r\n    val deepLink = waitText(\r\n        SendTextMessage(\r\n            it.chat.id, \"DeepLink, like\\n1349989478796692\", replyMarkup = nameReplyMarkup)\r\n    ).first().text.takeIf { it != \"Пропустить\"}\r\n    if (deepLink !=null){\r\n        arrayList.add(deepLink)\r\n    }else arrayList.add(null)\r\n\r\n    val app = App(arrayList[0]!!,arrayList[1]!!,arrayList[2],arrayList[3],arrayList[4])\r\n    replaceCurrentApp(app)\r\n    bot.sendMessage(it.chat, \"Done ${appToString(app)}\")\r\n}\r\n\r\nfun InlineKeyboardBuilder.includePageButtons() {\r\n    val firstLineButton = listOfNotNull(\r\n        BUNDLE,\r\n        APP_NAME,\r\n        URL,\r\n    )\r\n\r\n    val secondLineButton =listOfNotNull(\r\n        APPSFLYER,\r\n        DEEPLINK\r\n    )\r\n\r\n    row {\r\n        firstLineButton.forEach {\r\n            dataButton(it, it)\r\n        }\r\n\r\n    }\r\n    row {\r\n        secondLineButton.forEach {\r\n        dataButton(it, it)\r\n        }\r\n    }\r\n}\r\n\r\nfun changeDataApp(source : String, param : String, app: App) : Unit = when(source){\r\n    BUNDLE -> {\r\n        app.bundle =  param\r\n    }\r\n    APP_NAME ->{\r\n        app.appName = param\r\n    }\r\n    URL ->{\r\n        app.source = param\r\n    }\r\n    APPSFLYER ->{\r\n        app.appsFlyer = param\r\n    }\r\n    DEEPLINK ->{\r\n        app.fb = param\r\n    }\r\n    ALL ->{\r\n\r\n    }\r\n        else ->{\r\n    }\r\n}\r\n\r\nfun appToString(app: App): String {\r\n    return \"$BUNDLE = ${app.bundle}\\n$APP_NAME = ${app.appName}\\n$URL = ${app.source}\\n\" +\r\n            \"$APPSFLYER = ${app.appsFlyer}\\n$DEEPLINK = ${app.fb}\"\r\n}\r\n\r\nclass ConstValue{\r\n    companion object {\r\n        const val TOKEN = \"5368599889:AAHMGBROXto1fsOLpM4kikjnaALLjA_c8ww\"\r\n        const val BUNDLE = \"bundle\"\r\n        const val APP_NAME = \"app name\"\r\n        const val URL = \"url\"\r\n        const val APPSFLYER = \"appsFlyer\"\r\n        const val DEEPLINK = \"deepLink\"\r\n        const val ALL = \"all\"\r\n        const val NEXT = \"Пропустить\"\r\n        val nameReplyMarkup = ReplyKeyboardMarkup(\r\n            matrix {\r\n                row {\r\n                    +SimpleKeyboardButton(NEXT)\r\n                }\r\n            }\r\n        )\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/main.kt b/src/main/kotlin/main.kt
+--- a/src/main/kotlin/main.kt	(revision 6d272d050f40f9e2e1852a903970087bbbc51ef5)
++++ b/src/main/kotlin/main.kt	(date 1652435544461)
+@@ -25,7 +25,6 @@
+ import io.ktor.client.engine.cio.*
+ import io.ktor.client.features.json.*
+ import io.ktor.client.features.json.serializer.*
+-import io.ktor.client.features.logging.*
+ import io.ktor.client.request.*
+ import io.ktor.http.*
+ import ConstValue.Companion.BUNDLE
+@@ -41,88 +40,89 @@
+ import kotlin.collections.ArrayList
+ 
+ suspend fun main() {
+-    val bot = telegramBot(TOKEN)
+-    bot.buildBehaviourWithLongPolling {
+-        println(getMe())
+-        onCommand("apps") {
+-            bot.sendMessage(it.chat, "wait...")
+-            val apps = getApps()
+-            apps.forEach { app ->
+-                bot.sendMessage(it.chat, appToString(app))
+-            }
+-        }
+-        onCommand("search") { onCommandChat ->
+-            val searchBundle = waitText(
+-                SendTextMessage(
+-                    onCommandChat.chat.id,
+-                    "input $BUNDLE"
+-                )
+-            )
+-            val findApp: App = getCurrentApp(searchBundle.first().text) as App
+-            bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
+-                row {
+-                    includePageButtons()
+-                }
+-            })
+-            onMessageDataCallbackQuery {
+-                val name = it.data
+-                editMessageText(
+-                    it.message.withContent() ?: it.let {
+-                        answer(it, "Unsupported message type :(")
+-                        return@onMessageDataCallbackQuery },
+-                    "change $name on ${findApp.appName} app",
+-                    replyMarkup = inlineKeyboard {
+-                    }
+-                )
+-                val changeData = waitText().first().text
+-                changeDataApp(name, changeData, findApp)
+-                replaceCurrentApp(findApp)
+-                bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
+-            }
+-        }
+-        onCommand("put") {
+-            val arrayList = ArrayList<String?>()
+-            val bundle = waitText(
+-                SendTextMessage(
+-                    it.chat.id, "Bundle, like\ncom.opple.entel"
+-                )
+-            )
+-            arrayList.add(bundle[0].text)
+-            val name = waitText(
+-                SendTextMessage(
+-                    it.chat.id, "App name, like\nSoul of Apis"
+-                )
+-            )
+-            arrayList.add(name[0].text)
+-            val link = waitText(
+-                SendTextMessage(
+-                    it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
+-                )
+-            ).first().text.takeIf { it != NEXT }
+-            if (link != null) {
+-                arrayList.add(link)
+-            } else arrayList.add(null)
+-            val apps = waitText(
+-                SendTextMessage(
+-                    it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
+-                )
+-            ).first().text.takeIf { it != NEXT }
+-            if (apps != null) {
+-                arrayList.add(apps)
+-            } else arrayList.add(null)
+-            val deepLink = waitText(
+-                SendTextMessage(
+-                    it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
+-                )
+-            ).first().text.takeIf { it != NEXT }
+-            if (deepLink != null) {
+-                arrayList.add(deepLink)
+-            } else arrayList.add(null)
+-            val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
+-            postCurrentApp(app)
+-            bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
+-        }
+-    }.join()
++        val bot = telegramBot(TOKEN)
++        bot.buildBehaviourWithLongPolling {
++            println(getMe())
++            onCommand("apps") {
++                bot.sendMessage(it.chat, "wait...")
++                val apps = getApps()
++                apps.forEach { app ->
++                    bot.sendMessage(it.chat, appToString(app))
++                }
++            }
++            onCommand("search") { onCommandChat ->
++                val searchBundle = waitText(
++                    SendTextMessage(
++                        onCommandChat.chat.id,
++                        "input $BUNDLE"
++                    )
++                )
++                val findApp: App = getCurrentApp(searchBundle.first().text) as App
++                bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
++                    row {
++                        includePageButtons()
++                    }
++                })
++                onMessageDataCallbackQuery {
++                    val name = it.data
++                    editMessageText(
++                        it.message.withContent() ?: it.let {
++                            answer(it, "Unsupported message type :(")
++                            return@onMessageDataCallbackQuery
++                        },
++                        "change $name on ${findApp.appName} app",
++                        replyMarkup = inlineKeyboard {
++                        }
++                    )
++                    val changeData = waitText().first().text
++                    changeDataApp(name, changeData, findApp)
++                    replaceCurrentApp(findApp)
++                    bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
++                }
++            }
++            onCommand("put") {
++                val arrayList = ArrayList<String?>()
++                val bundle = waitText(
++                    SendTextMessage(
++                        it.chat.id, "Bundle, like\ncom.opple.entel"
++                    )
++                )
++                arrayList.add(bundle[0].text)
++                val name = waitText(
++                    SendTextMessage(
++                        it.chat.id, "App name, like\nSoul of Apis"
++                    )
++                )
++                arrayList.add(name[0].text)
++                val link = waitText(
++                    SendTextMessage(
++                        it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
++                    )
++                ).first().text.takeIf { it != NEXT }
++                if (link != null) {
++                    arrayList.add(link)
++                } else arrayList.add(null)
++                val apps = waitText(
++                    SendTextMessage(
++                        it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
++                    )
++                ).first().text.takeIf { it != NEXT }
++                if (apps != null) {
++                    arrayList.add(apps)
++                } else arrayList.add(null)
++                val deepLink = waitText(
++                    SendTextMessage(
++                        it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
++                    )
++                ).first().text.takeIf { it != NEXT }
++                if (deepLink != null) {
++                    arrayList.add(deepLink)
++                } else arrayList.add(null)
++                val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
++                postCurrentApp(app)
++                bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
++            }
++        }.join()
+ }
+ 
+ suspend fun postCurrentApp(app : App) = withContext(Dispatchers.IO){
+@@ -167,7 +167,6 @@
+ 
+ object Networking {
+     val client = HttpClient(CIO) {
+-        install(Logging)
+         install(JsonFeature) {
+             serializer = KotlinxSerializer()
+         }
+Index: settings.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\nrootProject.name = \"telegrambot\"\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/settings.gradle.kts b/settings.gradle.kts
+--- a/settings.gradle.kts	(revision 6d272d050f40f9e2e1852a903970087bbbc51ef5)
++++ b/settings.gradle.kts	(date 1652433740314)
+@@ -1,3 +1,2 @@
+-
+ rootProject.name = "telegrambot"
+ 
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"39bb3a94-f7bd-48ec-a622-22d38bb97ff0\" name=\"Changes\" comment=\"added inline button\">\r\n      <change beforePath=\"$PROJECT_DIR$/Procfile\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Procfile\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/settings.gradle.kts\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/settings.gradle.kts\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"ExternalProjectsData\">\r\n    <projectState path=\"$PROJECT_DIR$\">\r\n      <ProjectState />\r\n    </projectState>\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Kotlin File\" />\r\n        <option value=\"Kotlin Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"28iE4xnGxIny8jNvsr2HSm4Cbbw\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\">\r\n    <ConfirmationsSetting value=\"1\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,\r\n    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,\r\n    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyKotlinDeclarationDialog.RECENTS_KEY\">\r\n      <recent name=\"\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"Kotlin.MainKt\">\r\n    <configuration name=\"MainKt\" type=\"JetRunConfigurationType\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"MainKt\" />\r\n      <module name=\"GreyTelegramBot.main\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"SummatorKt\" type=\"JetRunConfigurationType\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"SummatorKt\" />\r\n      <module name=\"GreyTelegramBot.main\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Kotlin.MainKt\" />\r\n        <item itemvalue=\"Kotlin.SummatorKt\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"39bb3a94-f7bd-48ec-a622-22d38bb97ff0\" name=\"Changes\" comment=\"\" />\r\n      <created>1651690822831</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1651690822831</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"added search and try todo postCurrentApp\">\r\n      <created>1651747722097</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1651747722097</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"added search and try todo postCurrentApp\">\r\n      <created>1651763897952</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1651763897952</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"added search and try todo postCurrentApp\">\r\n      <created>1651764103960</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1651764103960</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"add change data\">\r\n      <created>1652360178409</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1652360178409</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"add change data\">\r\n      <created>1652360857489</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1652360857489</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"add change data\">\r\n      <created>1652367529067</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1652367529067</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"added inline button\">\r\n      <created>1652426284870</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1652426284870</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"added inline button\">\r\n      <created>1652427517858</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1652427517858</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"added inline button\">\r\n      <created>1652429909870</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1652429909870</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"10\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"added search and try todo postCurrentApp\" />\r\n    <MESSAGE value=\"add change data\" />\r\n    <MESSAGE value=\"added inline button\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"added inline button\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 6d272d050f40f9e2e1852a903970087bbbc51ef5)
++++ b/.idea/workspace.xml	(date 1652436805292)
+@@ -5,8 +5,10 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="39bb3a94-f7bd-48ec-a622-22d38bb97ff0" name="Changes" comment="added inline button">
+-      <change beforePath="$PROJECT_DIR$/Procfile" beforeDir="false" afterPath="$PROJECT_DIR$/Procfile" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/kotlin/main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/main.kt" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -17,6 +19,37 @@
+     <projectState path="$PROJECT_DIR$">
+       <ProjectState />
+     </projectState>
++  </component>
++  <component name="ExternalProjectsManager">
++    <system id="GRADLE">
++      <state>
++        <task path="$PROJECT_DIR$">
++          <activation />
++        </task>
++        <projects_view>
++          <tree_state>
++            <expand>
++              <path>
++                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
++                <item name="telegrambot" type="f1a62948:ProjectNode" />
++              </path>
++              <path>
++                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
++                <item name="telegrambot" type="f1a62948:ProjectNode" />
++                <item name="Tasks" type="e4a08cd1:TasksNode" />
++              </path>
++              <path>
++                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
++                <item name="telegrambot" type="f1a62948:ProjectNode" />
++                <item name="Tasks" type="e4a08cd1:TasksNode" />
++                <item name="application" type="c8890929:TasksNode$1" />
++              </path>
++            </expand>
++            <select />
++          </tree_state>
++        </projects_view>
++      </state>
++    </system>
+   </component>
+   <component name="FileTemplateManagerImpl">
+     <option name="RECENT_TEMPLATES">
+@@ -40,23 +73,54 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+-    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
+-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "RunOnceActivity.OpenProjectViewOnStart": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
++    "project.structure.last.edited": "Modules",
++    "project.structure.proportion": "0.0",
++    "project.structure.side.proportion": "0.2",
++    "settings.editor.selected.configurable": "preferences.pluginManager"
+   }
+-}</component>
++}]]></component>
+   <component name="RecentsManager">
++    <key name="MoveFile.RECENT_KEYS">
++      <recent name="C:\Users\renlo\IdeaProjects\telegrambot\src\main\resources" />
++    </key>
+     <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+       <recent name="" />
+     </key>
+   </component>
+-  <component name="RunManager" selected="Kotlin.MainKt">
++  <component name="RunManager" selected="Gradle.telegrambot [run]">
++    <configuration name="telegrambot [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
++      <ExternalSystemSettings>
++        <option name="executionName" />
++        <option name="externalProjectPath" value="$PROJECT_DIR$" />
++        <option name="externalSystemIdString" value="GRADLE" />
++        <option name="scriptParameters" />
++        <option name="taskDescriptions">
++          <list />
++        </option>
++        <option name="taskNames">
++          <list>
++            <option value="run" />
++          </list>
++        </option>
++        <option name="vmOptions" />
++      </ExternalSystemSettings>
++      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
++      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
++      <DebugAllEnabled>false</DebugAllEnabled>
++      <method v="2" />
++    </configuration>
++    <configuration name="MainKt (1)" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
++      <option name="MAIN_CLASS_NAME" value="MainKt" />
++      <module name="telegrambot.main" />
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
+     <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="MainKt" />
+       <module name="GreyTelegramBot.main" />
+@@ -73,6 +137,8 @@
+     </configuration>
+     <recent_temporary>
+       <list>
++        <item itemvalue="Gradle.telegrambot [run]" />
++        <item itemvalue="Kotlin.MainKt (1)" />
+         <item itemvalue="Kotlin.MainKt" />
+         <item itemvalue="Kotlin.SummatorKt" />
+       </list>
+@@ -150,7 +216,14 @@
+       <option name="project" value="LOCAL" />
+       <updated>1652429909870</updated>
+     </task>
+-    <option name="localTasksCounter" value="10" />
++    <task id="LOCAL-00010" summary="added inline button">
++      <created>1652430116721</created>
++      <option name="number" value="00010" />
++      <option name="presentableId" value="LOCAL-00010" />
++      <option name="project" value="LOCAL" />
++      <updated>1652430116721</updated>
++    </task>
++    <option name="localTasksCounter" value="11" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">

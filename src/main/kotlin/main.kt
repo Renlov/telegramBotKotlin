@@ -25,7 +25,6 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import ConstValue.Companion.BUNDLE
@@ -41,88 +40,89 @@ import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
-    val bot = telegramBot(TOKEN)
-    bot.buildBehaviourWithLongPolling {
-        println(getMe())
-        onCommand("apps") {
-            bot.sendMessage(it.chat, "wait...")
-            val apps = getApps()
-            apps.forEach { app ->
-                bot.sendMessage(it.chat, appToString(app))
-            }
-        }
-        onCommand("search") { onCommandChat ->
-            val searchBundle = waitText(
-                SendTextMessage(
-                    onCommandChat.chat.id,
-                    "input $BUNDLE"
-                )
-            )
-            val findApp: App = getCurrentApp(searchBundle.first().text) as App
-            bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
-                row {
-                    includePageButtons()
+        val bot = telegramBot(TOKEN)
+        bot.buildBehaviourWithLongPolling {
+            println(getMe())
+            onCommand("apps") {
+                bot.sendMessage(it.chat, "wait...")
+                val apps = getApps()
+                apps.forEach { app ->
+                    bot.sendMessage(it.chat, appToString(app))
                 }
-            })
-            onMessageDataCallbackQuery {
-                val name = it.data
-                editMessageText(
-                    it.message.withContent() ?: it.let {
-                        answer(it, "Unsupported message type :(")
-                        return@onMessageDataCallbackQuery },
-                    "change $name on ${findApp.appName} app",
-                    replyMarkup = inlineKeyboard {
-                    }
-                )
-                val changeData = waitText().first().text
-                changeDataApp(name, changeData, findApp)
-                replaceCurrentApp(findApp)
-                bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
             }
-        }
-        onCommand("put") {
-            val arrayList = ArrayList<String?>()
-            val bundle = waitText(
-                SendTextMessage(
-                    it.chat.id, "Bundle, like\ncom.opple.entel"
+            onCommand("search") { onCommandChat ->
+                val searchBundle = waitText(
+                    SendTextMessage(
+                        onCommandChat.chat.id,
+                        "input $BUNDLE"
+                    )
                 )
-            )
-            arrayList.add(bundle[0].text)
-            val name = waitText(
-                SendTextMessage(
-                    it.chat.id, "App name, like\nSoul of Apis"
+                val findApp: App = getCurrentApp(searchBundle.first().text) as App
+                bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
+                    row {
+                        includePageButtons()
+                    }
+                })
+                onMessageDataCallbackQuery {
+                    val name = it.data
+                    editMessageText(
+                        it.message.withContent() ?: it.let {
+                            answer(it, "Unsupported message type :(")
+                            return@onMessageDataCallbackQuery
+                        },
+                        "change $name on ${findApp.appName} app",
+                        replyMarkup = inlineKeyboard {
+                        }
+                    )
+                    val changeData = waitText().first().text
+                    changeDataApp(name, changeData, findApp)
+                    replaceCurrentApp(findApp)
+                    bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
+                }
+            }
+            onCommand("put") {
+                val arrayList = ArrayList<String?>()
+                val bundle = waitText(
+                    SendTextMessage(
+                        it.chat.id, "Bundle, like\ncom.opple.entel"
+                    )
                 )
-            )
-            arrayList.add(name[0].text)
-            val link = waitText(
-                SendTextMessage(
-                    it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
+                arrayList.add(bundle[0].text)
+                val name = waitText(
+                    SendTextMessage(
+                        it.chat.id, "App name, like\nSoul of Apis"
+                    )
                 )
-            ).first().text.takeIf { it != NEXT }
-            if (link != null) {
-                arrayList.add(link)
-            } else arrayList.add(null)
-            val apps = waitText(
-                SendTextMessage(
-                    it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
-                )
-            ).first().text.takeIf { it != NEXT }
-            if (apps != null) {
-                arrayList.add(apps)
-            } else arrayList.add(null)
-            val deepLink = waitText(
-                SendTextMessage(
-                    it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
-                )
-            ).first().text.takeIf { it != NEXT }
-            if (deepLink != null) {
-                arrayList.add(deepLink)
-            } else arrayList.add(null)
-            val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
-            postCurrentApp(app)
-            bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
-        }
-    }.join()
+                arrayList.add(name[0].text)
+                val link = waitText(
+                    SendTextMessage(
+                        it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
+                    )
+                ).first().text.takeIf { it != NEXT }
+                if (link != null) {
+                    arrayList.add(link)
+                } else arrayList.add(null)
+                val apps = waitText(
+                    SendTextMessage(
+                        it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
+                    )
+                ).first().text.takeIf { it != NEXT }
+                if (apps != null) {
+                    arrayList.add(apps)
+                } else arrayList.add(null)
+                val deepLink = waitText(
+                    SendTextMessage(
+                        it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
+                    )
+                ).first().text.takeIf { it != NEXT }
+                if (deepLink != null) {
+                    arrayList.add(deepLink)
+                } else arrayList.add(null)
+                val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
+                postCurrentApp(app)
+                bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
+            }
+        }.join()
 }
 
 suspend fun postCurrentApp(app : App) = withContext(Dispatchers.IO){
@@ -167,7 +167,6 @@ suspend fun getApps() = withContext(Dispatchers.IO)
 
 object Networking {
     val client = HttpClient(CIO) {
-        install(Logging)
         install(JsonFeature) {
             serializer = KotlinxSerializer()
         }
