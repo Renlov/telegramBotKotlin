@@ -45,6 +45,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
+    println("loga")
     val bot = telegramBot(System.getenv("KEYTELEGRAM"))
     val scope = CoroutineScope(Dispatchers.IO)
     val filter = FlowsUpdatesFilter()

@@ -61,7 +61,3 @@ tasks.withType<KotlinCompile> {
 tasks.create("stage") {
     dependsOn("installDist")
 }
-/*
-tasks.create("stage2") {
-    dependsOn("installDist")
-}*/
