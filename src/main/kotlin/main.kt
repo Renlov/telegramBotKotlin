@@ -49,7 +49,7 @@ suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
     val filter = FlowsUpdatesFilter()
 
-    bot.buildBehaviour(scope = scope) {
+    bot.buildBehaviour(scope = scope, flowUpdatesFilter = filter) {
         val subroute = UUID.randomUUID().toString()
 
         println(getMe())
