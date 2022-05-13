@@ -1,1 +1,1 @@
-web: ./build/install/telegrambot/bin/GreyTelegramBot
+web: ./build/install/telegrambot/bin/telegrambot

@@ -1,3 +1,3 @@
 
-rootProject.name = "GreyTelegramBot"
+rootProject.name = "telegrambot"
 
