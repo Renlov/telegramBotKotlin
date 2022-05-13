@@ -1,1 +1,1 @@
-web: ./build/install/GreyTelegramBot/bin/GreyTelegramBot
+worker: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/GreyTelegramBot.jar

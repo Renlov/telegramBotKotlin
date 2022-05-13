@@ -8,6 +8,16 @@ plugins {
     kotlin("plugin.serialization") version "1.4.21"
 }
 
+buildscript {
+    extra.set("kotlinVersion", "1.6.1")
+}
+
+sourceSets {
+    main {
+        kotlin.sourceSets.create("kotlin")
+    }
+}
+
 group = "com.sometime"
 version = "1.0-SNAPSHOT"
 
@@ -43,5 +53,5 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.create("stage") {
-    dependsOn("installDist")
+    dependsOn("build")
 }

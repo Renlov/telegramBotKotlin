@@ -36,12 +36,9 @@ import ConstValue.Companion.NEXT
 import ConstValue.Companion.TOKEN
 import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
-import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlin.collections.ArrayList
 
 suspend fun main() {
