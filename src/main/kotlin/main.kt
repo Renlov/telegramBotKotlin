@@ -41,119 +41,125 @@ import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
 import dev.inmo.tgbotapi.updateshandlers.FlowsUpdatesFilter
 import kotlinx.coroutines.*
-import org.apache.catalina.startup.Tomcat
 import java.util.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
-        val bot = telegramBot(System.getenv("KEYTELEGRAM"))
-        val scope = CoroutineScope(Dispatchers.Default)
-    val subroute = UUID.randomUUID().toString()
+    val bot = telegramBot(System.getenv("KEYTELEGRAM"))
+    val scope = CoroutineScope(Dispatchers.IO)
     val filter = FlowsUpdatesFilter()
+    bot.buildBehaviour(scope = scope) {
+        val subroute = UUID.randomUUID().toString()
 
-
-    val server = bot.setWebhookInfoAndStartListenWebhooks(System.getenv("PORT").toInt(), io.ktor.server.tomcat.Tomcat, SetWebhook(
-        "https://telegrambotgrey.herokuapp.com/$subroute", allowedUpdates = filter.allowedUpdates), {
-
-    }, "0.0.0.0", subroute, scope = scope, block = filter.asUpdateReceiver)
-
-    server.environment.connectors.forEach{
-        println(it)
-    }
-    server.start(false)
-
-
-
-       bot.buildBehaviour(filter) {
-            println(getMe())
-            onCommand("apps") {
-                bot.sendMessage(it.chat, "wait...")
-                val apps = getApps()
-                apps.forEach { app ->
-                    bot.sendMessage(it.chat, appToString(app))
-                }
+        println(getMe())
+        onCommand("apps") {
+            bot.sendMessage(it.chat, "wait...")
+            val apps = getApps()
+            apps.forEach { app ->
+                bot.sendMessage(it.chat, appToString(app))
             }
-            onCommand("search") { onCommandChat ->
-                val searchBundle = waitText(
-                    SendTextMessage(
-                        onCommandChat.chat.id,
-                        "input $BUNDLE"
-                    )
-                )
-                val findApp: App = getCurrentApp(searchBundle.first().text) as App
-                bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
-                    row {
-                        includePageButtons()
-                    }
-                })
-                onMessageDataCallbackQuery {
-                    val name = it.data
-                    editMessageText(
-                        it.message.withContent() ?: it.let {
-                            answer(it, "Unsupported message type :(")
-                            return@onMessageDataCallbackQuery
-                        },
-                        "change $name on ${findApp.appName} app",
-                        replyMarkup = inlineKeyboard {
-                        }
-                    )
-                    val changeData = waitText().first().text
-                    changeDataApp(name, changeData, findApp)
-                    replaceCurrentApp(findApp)
-                    bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
-                }
-            }
-            onCommand("put") {
-                val arrayList = ArrayList<String?>()
-                val bundle = waitText(
-                    SendTextMessage(
-                        it.chat.id, "Bundle, like\ncom.opple.entel"
-                    )
-                )
-                arrayList.add(bundle[0].text)
-                val name = waitText(
-                    SendTextMessage(
-                        it.chat.id, "App name, like\nSoul of Apis"
-                    )
-                )
-                arrayList.add(name[0].text)
-                val link = waitText(
-                    SendTextMessage(
-                        it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
-                    )
-                ).first().text.takeIf { it != NEXT }
-                if (link != null) {
-                    arrayList.add(link)
-                } else arrayList.add(null)
-                val apps = waitText(
-                    SendTextMessage(
-                        it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
-                    )
-                ).first().text.takeIf { it != NEXT }
-                if (apps != null) {
-                    arrayList.add(apps)
-                } else arrayList.add(null)
-                val deepLink = waitText(
-                    SendTextMessage(
-                        it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
-                    )
-                ).first().text.takeIf { it != NEXT }
-                if (deepLink != null) {
-                    arrayList.add(deepLink)
-                } else arrayList.add(null)
-                val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
-                postCurrentApp(app)
-                bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
-            }.join()
         }
+        onCommand("search") { onCommandChat ->
+            val searchBundle = waitText(
+                SendTextMessage(
+                    onCommandChat.chat.id,
+                    "input $BUNDLE"
+                )
+            )
+            val findApp: App = getCurrentApp(searchBundle.first().text) as App
+            bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
+                row {
+                    includePageButtons()
+                }
+            })
+            onMessageDataCallbackQuery {
+                val name = it.data
+                editMessageText(
+                    it.message.withContent() ?: it.let {
+                        answer(it, "Unsupported message type :(")
+                        return@onMessageDataCallbackQuery
+                    },
+                    "change $name on ${findApp.appName} app",
+                    replyMarkup = inlineKeyboard {
+                    }
+                )
+                val changeData = waitText().first().text
+                changeDataApp(name, changeData, findApp)
+                replaceCurrentApp(findApp)
+                bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
+            }
+        }
+        onCommand("put") {
+            val arrayList = ArrayList<String?>()
+            val bundle = waitText(
+                SendTextMessage(
+                    it.chat.id, "Bundle, like\ncom.opple.entel"
+                )
+            )
+            arrayList.add(bundle[0].text)
+            val name = waitText(
+                SendTextMessage(
+                    it.chat.id, "App name, like\nSoul of Apis"
+                )
+            )
+            arrayList.add(name[0].text)
+            val link = waitText(
+                SendTextMessage(
+                    it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
+                )
+            ).first().text.takeIf { it != NEXT }
+            if (link != null) {
+                arrayList.add(link)
+            } else arrayList.add(null)
+            val apps = waitText(
+                SendTextMessage(
+                    it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
+                )
+            ).first().text.takeIf { it != NEXT }
+            if (apps != null) {
+                arrayList.add(apps)
+            } else arrayList.add(null)
+            val deepLink = waitText(
+                SendTextMessage(
+                    it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
+                )
+            ).first().text.takeIf { it != NEXT }
+            if (deepLink != null) {
+                arrayList.add(deepLink)
+            } else arrayList.add(null)
+            val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
+            postCurrentApp(app)
+            bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
+        }
+
+        val server = bot.setWebhookInfoAndStartListenWebhooks(
+            System.getenv("PORT").toInt(),
+            io.ktor.server.tomcat.Tomcat, SetWebhook(
+                "https://telegrambotgrey.herokuapp.com/$subroute",
+                allowedUpdates = filter.allowedUpdates
+            ),
+            {
+                it.printStackTrace()
+            },
+            "0.0.0.0",
+            subroute,
+            scope = scope,
+            block = flowsUpdatesFilter.asUpdateReceiver
+        )
+        server.environment.connectors.forEach{
+            println(it)
+        }
+    }
+
+    scope.coroutineContext.job.join()
 }
 
 suspend fun postCurrentApp(app : App) = withContext(Dispatchers.IO){
     try {
-       client.post<App>("https://grey-source.herokuapp.com/add_app"){
-           contentType(ContentType.Application.Json)
-           body = app
-       }
+        client.post<App>("https://grey-source.herokuapp.com/add_app"){
+            contentType(ContentType.Application.Json)
+            body = app
+        }
     }catch (e : Exception){
         println(e)
     }
@@ -260,7 +266,7 @@ fun InlineKeyboardBuilder.includePageButtons() {
     }
     row {
         secondLineButton.forEach {
-        dataButton(it, it)
+            dataButton(it, it)
         }
     }
 }
@@ -284,7 +290,7 @@ fun changeDataApp(source : String, param : String, app: App) : Unit = when(sourc
     ALL ->{
 
     }
-        else ->{
+    else ->{
     }
 }
 
@@ -311,4 +317,3 @@ class ConstValue{
         )
     }
 }
-
