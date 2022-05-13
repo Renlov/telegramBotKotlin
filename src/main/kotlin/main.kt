@@ -30,7 +30,6 @@ import io.ktor.http.*
 import ConstValue.Companion.BUNDLE
 import ConstValue.Companion.DEEPLINK
 import ConstValue.Companion.NEXT
-import ConstValue.Companion.TOKEN
 import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
@@ -40,7 +39,7 @@ import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
-        val bot = telegramBot(TOKEN)
+        val bot = telegramBot(System.getenv("keyTelegram"))
         bot.buildBehaviourWithLongPolling {
             println(getMe())
             onCommand("apps") {
@@ -272,7 +271,6 @@ fun appToString(app: App): String {
 
 class ConstValue{
     companion object {
-
         const val BUNDLE = "bundle"
         const val APP_NAME = "app name"
         const val URL = "url"
