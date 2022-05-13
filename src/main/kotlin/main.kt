@@ -48,6 +48,7 @@ suspend fun main() {
     val bot = telegramBot(System.getenv("KEYTELEGRAM"))
     val scope = CoroutineScope(Dispatchers.IO)
     val filter = FlowsUpdatesFilter()
+
     bot.buildBehaviour(scope = scope) {
         val subroute = UUID.randomUUID().toString()
 
@@ -149,6 +150,7 @@ suspend fun main() {
         server.environment.connectors.forEach{
             println(it)
         }
+        server.start(false)
     }
 
     scope.coroutineContext.job.join()
