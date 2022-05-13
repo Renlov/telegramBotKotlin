@@ -33,11 +33,13 @@ import ConstValue.Companion.NEXT
 import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviour
 import dev.inmo.tgbotapi.extensions.utils.updates.flowsUpdatesFilter
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
 import dev.inmo.tgbotapi.requests.webhook.SetWebhook
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
+import dev.inmo.tgbotapi.updateshandlers.FlowsUpdatesFilter
 import kotlinx.coroutines.*
 import org.apache.catalina.startup.Tomcat
 import java.util.*
@@ -47,8 +49,7 @@ suspend fun main() {
         val bot = telegramBot(System.getenv("KEYTELEGRAM"))
         val scope = CoroutineScope(Dispatchers.Default)
     val subroute = UUID.randomUUID().toString()
-    val filter = flowsUpdatesFilter {
-    }
+    val filter = FlowsUpdatesFilter()
 
 
     val server = bot.setWebhookInfoAndStartListenWebhooks(System.getenv("PORT").toInt(), io.ktor.server.tomcat.Tomcat, SetWebhook(
@@ -63,7 +64,7 @@ suspend fun main() {
 
 
 
-       bot.buildBehaviourWithLongPolling {
+       bot.buildBehaviour(filter) {
             println(getMe())
             onCommand("apps") {
                 bot.sendMessage(it.chat, "wait...")
@@ -144,7 +145,7 @@ suspend fun main() {
                 postCurrentApp(app)
                 bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
             }
-        }.join()
+        }
 }
 
 suspend fun postCurrentApp(app : App) = withContext(Dispatchers.IO){
