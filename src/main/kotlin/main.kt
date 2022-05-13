@@ -144,7 +144,7 @@ suspend fun main() {
                 val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
                 postCurrentApp(app)
                 bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
-            }
+            }.join()
         }
 }
 
