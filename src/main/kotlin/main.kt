@@ -50,35 +50,27 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
-//    createKtorServer {
-//        routing {
-//            get {
-//                call.respond(HttpStatusCode.OK)
+//    embeddedServer(
+//        io.ktor.server.tomcat.Tomcat,
+//        applicationEngineEnvironment {
+//            module {
+//                routing {
+//                    get {
+//                        call.respond(HttpStatusCode.OK)
+//                    }
+//                }
+//            }
+//            connector {
+//                this.host = "0.0.0.0"
+//                this.port = System.getenv("PORT").toInt()
 //            }
 //        }
-//    }.start(true)
-    embeddedServer(
-        io.ktor.server.tomcat.Tomcat,
-        applicationEngineEnvironment {
-            module {
-                routing {
-                    get {
-                        call.respond(HttpStatusCode.OK)
-                    }
-                }
-            }
-            connector {
-                this.host = "0.0.0.0"
-                this.port = System.getenv("PORT").toInt()
-            }
-        }
-    ).start(true)
+//    ).start(true)
 
     val bot = telegramBot(System.getenv("KEYTELEGRAM"))
     val scope = CoroutineScope(Dispatchers.IO)
-    val filter = FlowsUpdatesFilter()
 
-    bot.buildBehaviour(scope = scope, flowUpdatesFilter = filter) {
+    bot.buildBehaviour(scope = scope) {
         val subroute = UUID.randomUUID().toString()
 
         println(getMe())
@@ -167,7 +159,7 @@ suspend fun main() {
             System.getenv("PORT").toInt(),
             io.ktor.server.tomcat.Tomcat, SetWebhook(
                 "https://telegrambotgrey.herokuapp.com/$subroute",
-                allowedUpdates = filter.allowedUpdates
+                allowedUpdates = allowedUpdates
             ),
             {
                 it.printStackTrace()
@@ -175,7 +167,9 @@ suspend fun main() {
             "0.0.0.0",
             subroute,
             scope = scope,
-            block = flowsUpdatesFilter.asUpdateReceiver
+            block = {
+                println(it)
+            }
         )
         server.environment.connectors.forEach{
             println(it)
