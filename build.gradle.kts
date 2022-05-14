@@ -24,14 +24,12 @@ application{
 
 repositories {
     mavenCentral()
-    mavenLocal()
     maven {
         url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
     }
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
     implementation ("dev.inmo:tgbotapi:1.1.0")
 
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
