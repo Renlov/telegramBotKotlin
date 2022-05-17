@@ -132,13 +132,24 @@ suspend fun main() {
                 } else arrayList.add(null)
                 val deepLink = waitText(
                     SendTextMessage(
-                        it.chat.id, "DeepLink, like\n1349989478796692", replyMarkup = nameReplyMarkup
+                        it.chat.id, "Facebook appId, like\n1349989478796692", replyMarkup = nameReplyMarkup
                     )
                 ).first().text.takeIf { it != NEXT }
                 if (deepLink != null) {
                     arrayList.add(deepLink)
                 } else arrayList.add(null)
-                val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4])
+
+                val appMarker = waitText(
+                    SendTextMessage(
+                        it.chat.id, "Facebook appMarker, like\n599f0f527ce2d13678e170d47e2a6cf3", replyMarkup = nameReplyMarkup
+                    )
+                ).first().text.takeIf { it != NEXT }
+                if (appMarker != null) {
+                    arrayList.add(appMarker)
+                } else arrayList.add(null)
+
+
+                val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4], arrayList[5])
                 postCurrentApp(app)
                 bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
             }
