@@ -6,5 +6,6 @@ data class App(
     var appName: String,
     var source: String? = null,
     var appsFlyer: String? = null,
-    var fb: String? = null
+    var fbAppId: String? = null,
+    var fbClientSecret: String? = null
 )

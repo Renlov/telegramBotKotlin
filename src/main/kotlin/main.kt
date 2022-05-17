@@ -7,7 +7,6 @@ import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
-import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitText
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
@@ -25,14 +24,12 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import ConstValue.Companion.BUNDLE
-import ConstValue.Companion.DEEPLINK
+import ConstValue.Companion.FBAPPID
+import ConstValue.Companion.FBCLIENTSECRET
 import ConstValue.Companion.NEXT
 import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
-import dev.inmo.tgbotapi.bot.ktor.telegramBot
-import dev.inmo.tgbotapi.extensions.api.send.reply
-import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledCommand
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
@@ -42,7 +39,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 suspend fun main() {
@@ -66,8 +62,6 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
-
-
             onCommand("apps") {
                 bot.sendMessage(it.chat, "wait...")
                 val apps = getApps()
@@ -75,6 +69,7 @@ suspend fun main() {
                     bot.sendMessage(it.chat, appToString(app))
                 }
             }
+
             onCommand("search") { onCommandChat ->
                 val searchBundle = waitText(
                     SendTextMessage(
@@ -209,7 +204,7 @@ fun InlineKeyboardBuilder.includePageButtons() {
 
     val secondLineButton =listOfNotNull(
         APPSFLYER,
-        DEEPLINK
+        FBAPPID
     )
 
     row {
@@ -238,8 +233,8 @@ fun changeDataApp(source : String, param : String, app: App) : Unit = when(sourc
     APPSFLYER ->{
         app.appsFlyer = param
     }
-    DEEPLINK ->{
-        app.fb = param
+    FBAPPID ->{
+        app.fbAppId = param
     }
     ALL ->{
 
@@ -250,7 +245,8 @@ fun changeDataApp(source : String, param : String, app: App) : Unit = when(sourc
 
 fun appToString(app: App): String {
     return "$BUNDLE = ${app.bundle}\n$APP_NAME = ${app.appName}\n$URL = ${app.source}\n" +
-            "$APPSFLYER = ${app.appsFlyer}\n$DEEPLINK = ${app.fb}"
+            "$APPSFLYER = ${app.appsFlyer}\n$FBAPPID = ${app.fbAppId}\n" +
+            "$FBCLIENTSECRET = ${app.fbClientSecret}"
 }
 
 class ConstValue{
@@ -259,7 +255,8 @@ class ConstValue{
         const val APP_NAME = "app name"
         const val URL = "url"
         const val APPSFLYER = "appsFlyer"
-        const val DEEPLINK = "deepLink"
+        const val FBAPPID = "Facebook appId"
+        const val FBCLIENTSECRET = "Facebook appMarker"
         const val ALL = "all"
         const val NEXT = "Пропустить"
         val nameReplyMarkup = ReplyKeyboardMarkup(
