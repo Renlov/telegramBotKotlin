@@ -107,7 +107,7 @@ suspend fun main() {
                         it.chat.id, "Bundle, like\ncom.opple.entel"
                     )
                 )
-                arrayList.add(bundle[0].text)
+                arrayList.add(bundle[0].text.lowercase().replace(" ", ""))
                 val name = waitText(
                     SendTextMessage(
                         it.chat.id, "App name, like\nSoul of Apis"
