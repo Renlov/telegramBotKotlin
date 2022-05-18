@@ -66,16 +66,12 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
-            onChatMemberUpdated(initialFilter = { it.chat is PrivateChat && it.newChatMemberState is MemberChatMember }) {
-                user = it.user
-
-            }
-
             runCatchingSafely {
                 onCommand("info") {
-//                    if (it.chat.id == user!!.id){
-//                        bot.sendMessage(it.chat, "aaa")
-//                    }
+                    onChatMemberUpdated(initialFilter = { it.chat is PrivateChat && it.newChatMemberState is MemberChatMember }) {
+                        user = it.user
+
+                    }
                     bot.sendMessage(
                         it.chat, "Hello, this is a gray department bot.\n" +
                                 "In this chat you can add apps, search + correct data and find all apps\n\n" +
