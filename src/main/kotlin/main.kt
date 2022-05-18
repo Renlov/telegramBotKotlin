@@ -66,12 +66,9 @@ suspend fun main() {
 
         onUnhandledCommand {
             onCommand("test"){
-                onChatMemberUpdated {
-                    bot.sendMessage(it.chat, it.user.id.toString())
-                    bot.sendMessage(it.chat, it.user.id.chatId.toString())
                     bot.sendMessage(it.chat, it.chat.id.toString())
                     bot.sendMessage(it.chat, it.chat.toString())
-                }
+
             }
             runCatchingSafely {
                 onCommand("info") {
