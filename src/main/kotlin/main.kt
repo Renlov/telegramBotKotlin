@@ -28,16 +28,10 @@ import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
-import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
 import dev.inmo.tgbotapi.requests.webhook.SetWebhook
-import dev.inmo.tgbotapi.types.chat.PrivateChat
-import dev.inmo.tgbotapi.types.chat.User
-import dev.inmo.tgbotapi.types.chat.member.MemberChatMember
-import dev.inmo.tgbotapi.types.membersLimit
-import dev.inmo.tgbotapi.utils.PreviewFeature
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -45,63 +39,42 @@ import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 
-private var user : User? = null
-
 suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
-    val subrouteApp = uuid4().toString()
+    val subRoute = uuid4().toString()
+
     telegramBotWithBehaviour(System.getenv("KEYTELEGRAM"), scope = scope) {
         setWebhookInfoAndStartListenWebhooks(
             System.getenv("PORT").toInt(),
             Tomcat,
-            SetWebhook("https://telegrambotgrey.herokuapp.com/$subrouteApp"),
+            SetWebhook("https://telegrambotgrey.herokuapp.com/$subRoute"),
             {
                 it.printStackTrace()
             },
             "0.0.0.0",
-            subrouteApp,
+            subRoute,
             scope = this,
             block = asUpdateReceiver
         )
         println(getMe())
 
         onUnhandledCommand {
-            runCatchingSafely {
-                onCommand("info") {
-                    onChatMemberUpdated(initialFilter = { it.chat is PrivateChat && it.newChatMemberState is MemberChatMember }) {
-                        user = it.user
 
-                        bot.sendMessage(
-                            it.chat, "Hello, this is a gray department bot.\n" +
-                                    "In this chat you can add apps, search + correct data and find all apps\n\n" +
-                                    "You have this commands:\n" +
-                                    "/apps - find all apps\n" +
-                                    "/search - to find app information and correct data\n" +
-                                    "/put - to add app in database\n\n" +
-                                    "if bot asleep, open link in browser to wake up bot\n" +
-                                    "https://telegrambotgrey.herokuapp.com\n" +
-                                    "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!" +
-                                    "$user"
-                        )
-
-                    }
-//                    bot.sendMessage(
-//                        it.chat, "Hello, this is a gray department bot.\n" +
-//                                "In this chat you can add apps, search + correct data and find all apps\n\n" +
-//                                "You have this commands:\n" +
-//                                "/apps - find all apps\n" +
-//                                "/search - to find app information and correct data\n" +
-//                                "/put - to add app in database\n\n" +
-//                                "if bot asleep, open link in browser to wake up bot\n" +
-//                                "https://telegrambotgrey.herokuapp.com\n" +
-//                                "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!" +
-//                                "$user"
-//                    )
-                }
+            onCommand("info") {
+                sendMessage(
+                    it.chat, "Hello, this is a gray department bot.\n" +
+                            "In this chat you can add apps, search + correct data and find all apps\n\n" +
+                            "You have this commands:\n" +
+                            "/apps - find all apps\n" +
+                            "/search - to find app information and correct data\n" +
+                            "/put - to add app in database\n\n" +
+                            "if bot asleep, open link in browser to wake up bot\n" +
+                            "https://telegrambotgrey.herokuapp.com\n" +
+                            "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
+                )
             }
-
             onCommand("apps") {
-                bot.sendMessage(it.chat, "wait...(sometimes more 10 second)")
+                sendMessage(it.chat, "wait...(sometimes more 10 second)")
                 val apps = getApps()
                 apps.forEach { app ->
                     bot.sendMessage(it.chat, appToString(app))
@@ -135,7 +108,7 @@ suspend fun main() {
                     val changeData = waitText().first().text
                     changeDataApp(name, changeData, findApp)
                     replaceCurrentApp(findApp)
-                    bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
+                    sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
                 }
             }
             onCommand("put") {
@@ -189,7 +162,7 @@ suspend fun main() {
 
                 val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4], arrayList[5])
                 postCurrentApp(app)
-                bot.sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
+                sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
             }
         }
     }
