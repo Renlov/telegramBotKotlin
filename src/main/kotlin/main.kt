@@ -62,8 +62,18 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
+            onCommand("start") {
+                bot.sendMessage(it.chat, "Hello, this is a gray department bot.\n" +
+                        "In this chat you can add apps, search + correct data and find all apps\n\n" +
+                        "You have this commands:\n" +
+                        "/apps - find all apps\n" +
+                        "/search - to find app information and correct data\n" +
+                        "/put - to add app in database\n\n" +
+                        "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!")
+            }
+
             onCommand("apps") {
-                bot.sendMessage(it.chat, "wait...")
+                bot.sendMessage(it.chat, "wait...(sometimes more 10 second)")
                 val apps = getApps()
                 apps.forEach { app ->
                     bot.sendMessage(it.chat, appToString(app))
@@ -104,7 +114,7 @@ suspend fun main() {
                 val arrayList = ArrayList<String?>()
                 val bundle = waitText(
                     SendTextMessage(
-                        it.chat.id, "Bundle, like\ncom.opple.entel"
+                        it.chat.id, "Bundle, like\ncom.opple.entel\nАНЯ, ЕГО НЕЛЬЗЯ БУДЕТ ПОМЕНЯТЬ!"
                     )
                 )
                 arrayList.add(bundle[0].text.lowercase().replace(" ", ""))
@@ -208,14 +218,14 @@ object Networking {
 }
 fun InlineKeyboardBuilder.includePageButtons() {
     val firstLineButton = listOfNotNull(
-        BUNDLE,
         APP_NAME,
         URL,
+        APPSFLYER,
     )
 
     val secondLineButton =listOfNotNull(
-        APPSFLYER,
-        FBAPPID
+        FBAPPID,
+        FBCLIENTSECRET
     )
 
     row {
@@ -232,9 +242,6 @@ fun InlineKeyboardBuilder.includePageButtons() {
 }
 
 fun changeDataApp(source : String, param : String, app: App) : Unit = when(source){
-    BUNDLE -> {
-        app.bundle =  param
-    }
     APP_NAME ->{
         app.appName = param
     }
@@ -247,8 +254,8 @@ fun changeDataApp(source : String, param : String, app: App) : Unit = when(sourc
     FBAPPID ->{
         app.fbAppId = param
     }
-    ALL ->{
-
+    FBCLIENTSECRET ->{
+        app.fbClientSecret = param
     }
     else ->{
     }
