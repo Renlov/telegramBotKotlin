@@ -63,11 +63,7 @@ suspend fun main() {
             block = asUpdateReceiver
         )
         println(getMe())
-        onUnhandledCommand {
-            onCommand("test"){
-                bot.sendMessage(it.chat, getChatMemberCount(it.chat.id).toString())
-            }
-        }
+
         onUnhandledCommand {
             onCommand("test"){
                 onChatMemberUpdated {
