@@ -32,6 +32,8 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
 import dev.inmo.tgbotapi.requests.webhook.SetWebhook
+import dev.inmo.tgbotapi.types.chat.Chat
+import dev.inmo.tgbotapi.types.chat.PrivateChat
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -43,7 +45,7 @@ import kotlin.collections.ArrayList
 suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
     val subRoute = uuid4().toString()
-    val userList = mutableSetOf<String>()
+    val startedChats = mutableSetOf<Chat>()
     telegramBotWithBehaviour(System.getenv("KEYTELEGRAM"), scope = scope) {
         setWebhookInfoAndStartListenWebhooks(
             System.getenv("PORT").toInt(),
@@ -61,9 +63,7 @@ suspend fun main() {
 
         onUnhandledCommand {
 
-            onCommand("start"){
-                if (userList.contains(it.chat.id.chatId.toString()).not()){
-                    userList.add(it.chat.id.chatId.toString())
+            onCommand("start", initialFilter = { it.chat is PrivateChat && startedChats.add(it.chat) }){
                     sendMessage(
                         it.chat, "Hello, this is a gray department bot.\n" +
                                 "In this chat you can add apps, search + correct data and find all apps\n\n" +
@@ -75,7 +75,6 @@ suspend fun main() {
                                 "https://telegrambotgrey.herokuapp.com\n" +
                                 "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
                     )
-                }else null
             }
 
             onCommand("info") {
