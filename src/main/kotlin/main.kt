@@ -80,6 +80,8 @@ suspend fun main() {
 //                    println(chat.id)
 //                }
 //            }
+
+            println(it.chat.id)
             onCommand("info") {
                 sendMessage(
                     it.chat, "Hello, this is a gray department bot.\n" +
