@@ -1,4 +1,3 @@
-import ConstValue.Companion.ALL
 import ConstValue.Companion.APPSFLYER
 import ConstValue.Companion.APP_NAME
 import Networking.client
@@ -31,8 +30,9 @@ import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
-import dev.inmo.tgbotapi.extensions.api.send.reply
+import dev.inmo.tgbotapi.extensions.api.chat.get.getChatMemberCount
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onChatMemberUpdated
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledCommand
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
 import dev.inmo.tgbotapi.requests.webhook.SetWebhook
@@ -62,9 +62,21 @@ suspend fun main() {
             scope = this,
             block = asUpdateReceiver
         )
-
         println(getMe())
         onUnhandledCommand {
+            onCommand("test"){
+                bot.sendMessage(it.chat, getChatMemberCount(it.chat.id).toString())
+            }
+        }
+        onUnhandledCommand {
+            onCommand("test"){
+                onChatMemberUpdated {
+                    bot.sendMessage(it.chat, it.user.id.toString())
+                    bot.sendMessage(it.chat, it.user.id.chatId.toString())
+                    bot.sendMessage(it.chat, it.chat.id.toString())
+                    bot.sendMessage(it.chat, it.chat.toString())
+                }
+            }
             runCatchingSafely {
                 onCommand("info") {
                     bot.sendMessage(
