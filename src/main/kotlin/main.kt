@@ -63,6 +63,7 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
+
             onCommand("start", initialFilter = { it.chat is PrivateChat && startedChats.add(it.chat) }){
                 reply(it, "Hello, this is a gray department bot.\n" +
                                 "In this chat you can add apps, search + correct data and find all apps\n\n" +
@@ -74,8 +75,11 @@ suspend fun main() {
                                 "https://telegrambotgrey.herokuapp.com\n" +
                                 "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
                     )
+                println(it.chat)
+                startedChats.forEach {chat ->
+                    println(chat.id)
+                }
             }
-
             onCommand("info") {
                 sendMessage(
                     it.chat, "Hello, this is a gray department bot.\n" +
@@ -96,7 +100,6 @@ suspend fun main() {
                     bot.sendMessage(it.chat, appToString(app))
                 }
             }
-
             onCommand("search") { onCommandChat ->
                 val searchBundle = waitText(
                     SendTextMessage(
