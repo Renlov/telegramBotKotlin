@@ -73,9 +73,9 @@ suspend fun main() {
 
             runCatchingSafely {
                 onCommand("info") {
-                    if (it.chat.id == user!!.id){
-                        bot.sendMessage(it.chat, "aaa")
-                    }
+//                    if (it.chat.id == user!!.id){
+//                        bot.sendMessage(it.chat, "aaa")
+//                    }
                     bot.sendMessage(
                         it.chat, "Hello, this is a gray department bot.\n" +
                                 "In this chat you can add apps, search + correct data and find all apps\n\n" +
@@ -85,7 +85,8 @@ suspend fun main() {
                                 "/put - to add app in database\n\n" +
                                 "if bot asleep, open link in browser to wake up bot\n" +
                                 "https://telegrambotgrey.herokuapp.com\n" +
-                                "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
+                                "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!" +
+                                "$user"
                     )
                 }
             }
