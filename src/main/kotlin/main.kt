@@ -64,7 +64,17 @@ suspend fun main() {
             onCommand("start"){
                 if (userList.contains(it.chat.id.chatId.toString()).not()){
                     userList.add(it.chat.id.chatId.toString())
-                    sendMessage(it.chat, "Hello")
+                    sendMessage(
+                        it.chat, "Hello, this is a gray department bot.\n" +
+                                "In this chat you can add apps, search + correct data and find all apps\n\n" +
+                                "You have this commands:\n" +
+                                "/apps - find all apps\n" +
+                                "/search - to find app information and correct data\n" +
+                                "/put - to add app in database\n\n" +
+                                "if bot asleep, open link in browser to wake up bot\n" +
+                                "https://telegrambotgrey.herokuapp.com\n" +
+                                "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
+                    )
                 }else null
             }
 
