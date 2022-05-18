@@ -37,12 +37,13 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
+import java.math.BigInteger
 import kotlin.collections.ArrayList
 
 suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
     val subRoute = uuid4().toString()
-
+    val userList = mutableSetOf<String>()
     telegramBotWithBehaviour(System.getenv("KEYTELEGRAM"), scope = scope) {
         setWebhookInfoAndStartListenWebhooks(
             System.getenv("PORT").toInt(),
@@ -59,6 +60,13 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
+
+            onCommand("start"){
+                if (userList.contains(it.chat.id.chatId.toString()).not()){
+                    userList.add(it.chat.id.chatId.toString())
+                    sendMessage(it.chat, "Hello")
+                }else null
+            }
 
             onCommand("info") {
                 sendMessage(
