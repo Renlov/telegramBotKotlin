@@ -30,6 +30,7 @@ import ConstValue.Companion.NEXT
 import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledCommand
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
@@ -62,7 +63,20 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
-            onCommand("start") {
+
+            onCommand("start"){
+                reply(it, "Hello, this is a gray department bot.\n" +
+                        "In this chat you can add apps, search + correct data and find all apps\n\n" +
+                        "You have this commands:\n" +
+                        "/apps - find all apps\n" +
+                        "/search - to find app information and correct data\n" +
+                        "/put - to add app in database\n\n" +
+                        "if bot asleep, open link in browser to wake up bot\n" +
+                        "https://telegrambotgrey.herokuapp.com\n" +
+                        "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!")
+            }
+
+            onCommand("info"){
                 bot.sendMessage(it.chat, "Hello, this is a gray department bot.\n" +
                         "In this chat you can add apps, search + correct data and find all apps\n\n" +
                         "You have this commands:\n" +
