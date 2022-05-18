@@ -7,8 +7,6 @@ import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitText
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.row
 import dev.inmo.tgbotapi.extensions.utils.withContent
@@ -30,12 +28,15 @@ import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
-import dev.inmo.tgbotapi.extensions.api.chat.get.getChatMemberCount
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onChatMemberUpdated
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onUnhandledCommand
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
 import dev.inmo.tgbotapi.requests.webhook.SetWebhook
+import dev.inmo.tgbotapi.types.chat.PrivateChat
+import dev.inmo.tgbotapi.types.chat.User
+import dev.inmo.tgbotapi.types.chat.member.MemberChatMember
+import dev.inmo.tgbotapi.types.membersLimit
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -44,34 +45,37 @@ import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 
-@OptIn(PreviewFeature::class)
+private var user : User? = null
+
 suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
-    val subroute = uuid4().toString()
-
+    val subrouteApp = uuid4().toString()
     telegramBotWithBehaviour(System.getenv("KEYTELEGRAM"), scope = scope) {
         setWebhookInfoAndStartListenWebhooks(
             System.getenv("PORT").toInt(),
             Tomcat,
-            SetWebhook("https://telegrambotgrey.herokuapp.com/$subroute"),
+            SetWebhook("https://telegrambotgrey.herokuapp.com/$subrouteApp"),
             {
                 it.printStackTrace()
             },
             "0.0.0.0",
-            subroute,
+            subrouteApp,
             scope = this,
             block = asUpdateReceiver
         )
         println(getMe())
 
         onUnhandledCommand {
-            onCommand("test"){
-                    bot.sendMessage(it.chat, it.chat.id.toString())
-                    bot.sendMessage(it.chat, it.chat.toString())
+            onChatMemberUpdated(initialFilter = { it.chat is PrivateChat && it.newChatMemberState is MemberChatMember }) {
+                user = it.user
 
             }
+
             runCatchingSafely {
                 onCommand("info") {
+                    if (it.chat.id == user!!.id){
+                        bot.sendMessage(it.chat, "aaa")
+                    }
                     bot.sendMessage(
                         it.chat, "Hello, this is a gray department bot.\n" +
                                 "In this chat you can add apps, search + correct data and find all apps\n\n" +
