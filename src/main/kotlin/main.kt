@@ -28,6 +28,7 @@ import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
@@ -62,10 +63,8 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
-
             onCommand("start", initialFilter = { it.chat is PrivateChat && startedChats.add(it.chat) }){
-                    sendMessage(
-                        it.chat, "Hello, this is a gray department bot.\n" +
+                reply(it, "Hello, this is a gray department bot.\n" +
                                 "In this chat you can add apps, search + correct data and find all apps\n\n" +
                                 "You have this commands:\n" +
                                 "/apps - find all apps\n" +
