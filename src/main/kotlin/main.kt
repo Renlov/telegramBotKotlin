@@ -104,20 +104,20 @@ suspend fun main() {
                     val name = it.data
                     if (name == DELETE){
                         sendMessage(onCommandChat.chat, "Are delete ${findApp.appName}?", replyMarkup = nameReplyDeleteMarkup)
-                        val isDelete = waitText().first().text
 
-                        if (isDelete == DELETEYES){
-                            deleteCurrentApp(findApp.bundle)
-                            sendMessage(onCommandChat.chat, "${findApp.appName} deleted", replyMarkup = ReplyKeyboardRemove(false))
-                            return@onMessageDataCallbackQuery
+                        when(waitText().first().text){
+                            DELETEYES ->{
+                                deleteCurrentApp(findApp.bundle)
+                                sendMessage(onCommandChat.chat, "${findApp.appName} deleted", replyMarkup = ReplyKeyboardRemove(false))
+                                println(waitText().first().text)
+                                return@onMessageDataCallbackQuery
+                            }
 
-                        }else if (isDelete== DELETENO) {
-                            sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
-                            return@onMessageDataCallbackQuery
-
-                        } else{
-                            sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
-                            return@onMessageDataCallbackQuery
+                            else ->{
+                                sendMessage(onCommandChat.chat, "cancel", replyMarkup = ReplyKeyboardRemove(false))
+                                println(waitText().first().text)
+                                return@onMessageDataCallbackQuery
+                            }
                         }
                     }
                     editMessageText(
