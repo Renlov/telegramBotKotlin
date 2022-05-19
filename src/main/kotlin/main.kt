@@ -21,6 +21,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import ConstValue.Companion.BUNDLE
+import ConstValue.Companion.DELETE
 import ConstValue.Companion.FBAPPID
 import ConstValue.Companion.FBCLIENTSECRET
 import ConstValue.Companion.NEXT
@@ -63,36 +64,16 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
-
-//            onCommand("start", initialFilter = { it.chat is PrivateChat && startedChats.add(it.chat) }){
-//                reply(it, "Hello, this is a gray department bot.\n" +
-//                                "In this chat you can add apps, search + correct data and find all apps\n\n" +
-//                                "You have this commands:\n" +
-//                                "/apps - find all apps\n" +
-//                                "/search - to find app information and correct data\n" +
-//                                "/put - to add app in database\n\n" +
-//                                "if bot asleep, open link in browser to wake up bot\n" +
-//                                "https://telegrambotgrey.herokuapp.com\n" +
-//                                "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
-//                    )
-//                println(it.chat)
-//                startedChats.forEach {chat ->
-//                    println(chat.id)
-//                }
-//            }
-
-            println(it.chat.id)
-            onCommand("info") {
-                sendMessage(
-                    it.chat, "Hello, this is a gray department bot.\n" +
-                            "In this chat you can add apps, search + correct data and find all apps\n\n" +
-                            "You have this commands:\n" +
-                            "/apps - find all apps\n" +
-                            "/search - to find app information and correct data\n" +
-                            "/put - to add app in database\n\n" +
-                            "if bot asleep, open link in browser to wake up bot\n" +
-                            "https://telegrambotgrey.herokuapp.com\n" +
-                            "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
+            onCommand("info") { sendMessage(
+                it.chat, "Hello, this is a gray department bot.\n" +
+                        "In this chat you can add apps, search + correct data and find all apps\n\n" +
+                        "You have this commands:\n" +
+                        "/apps - find all apps\n" +
+                        "/search - to find app information and correct data\n" +
+                        "/put - to add app in database\n\n" +
+                        "if bot asleep, open link in browser to wake up bot\n" +
+                        "https://telegrambotgrey.herokuapp.com\n" +
+                        "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
                 )
             }
             onCommand("apps") {
@@ -115,8 +96,14 @@ suspend fun main() {
                         includePageButtons()
                     }
                 })
+
                 onMessageDataCallbackQuery {
                     val name = it.data
+
+                    if (name == DELETE){
+                        answer(it, "Deleted")
+                        return@onMessageDataCallbackQuery
+                    }
                     editMessageText(
                         it.message.withContent() ?: it.let {
                             answer(it, "Unsupported message type :(")
@@ -261,6 +248,10 @@ fun InlineKeyboardBuilder.includePageButtons() {
             dataButton(it, it)
         }
     }
+
+    row {
+        dataButton(DELETE, DELETE)
+    }
 }
 
 fun changeDataApp(source : String, param : String, app: App) : Unit = when(source){
@@ -298,6 +289,7 @@ class ConstValue{
         const val FBAPPID = "Facebook appId"
         const val FBCLIENTSECRET = "Facebook appMarker"
         const val ALL = "all"
+        const val DELETE = "delete"
         const val NEXT = "Пропустить"
         val nameReplyMarkup = ReplyKeyboardMarkup(
             matrix {
