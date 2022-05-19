@@ -108,8 +108,8 @@ suspend fun main() {
                             deleteCurrentApp(findApp.bundle)
                             sendMessage(onCommandChat.chat, "${findApp.appName} deleted", replyMarkup = ReplyKeyboardRemove(false))
                             return@onMessageDataCallbackQuery
-                        }
-                        sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
+                        } else sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
+
                         return@onMessageDataCallbackQuery
                     }
                     editMessageText(
