@@ -50,7 +50,6 @@ import kotlin.collections.ArrayList
 suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
     val subRoute = uuid4().toString()
-    val startedChats = mutableSetOf<Chat>()
     telegramBotWithBehaviour(System.getenv("KEYTELEGRAM"), scope = scope) {
         setWebhookInfoAndStartListenWebhooks(
             System.getenv("PORT").toInt(),
@@ -79,6 +78,7 @@ suspend fun main() {
                         "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
                 )
             }
+
             onCommand("apps") {
                 sendMessage(it.chat, "wait...(sometimes more 10 second)")
                 val apps = getApps()
@@ -135,7 +135,7 @@ suspend fun main() {
                     sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
                 }
             }
-            onCommand("put") {
+            onCommand("add") {
                 val arrayList = ArrayList<String?>()
                 val bundle = waitText(
                     SendTextMessage(
