@@ -114,7 +114,11 @@ suspend fun main() {
                         }else if (isDelete== DELETENO) {
                             sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
                             return@onMessageDataCallbackQuery
-                        } else return@onMessageDataCallbackQuery
+
+                        } else{
+                            sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
+                            return@onMessageDataCallbackQuery
+                        }
                     }
                     editMessageText(
                         it.message.withContent() ?: it.let {
