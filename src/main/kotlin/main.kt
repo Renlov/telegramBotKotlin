@@ -22,10 +22,12 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import ConstValue.Companion.BUNDLE
 import ConstValue.Companion.DELETE
+import ConstValue.Companion.DELETEYES
 import ConstValue.Companion.FBAPPID
 import ConstValue.Companion.FBCLIENTSECRET
 import ConstValue.Companion.NEXT
 import ConstValue.Companion.URL
+import ConstValue.Companion.nameReplyDeleteMarkup
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
@@ -99,9 +101,15 @@ suspend fun main() {
 
                 onMessageDataCallbackQuery {
                     val name = it.data
-
                     if (name == DELETE){
-                        answer(it, "Deleted")
+                        sendMessage(onCommandChat.chat, "Are delete ${findApp.appName}?", replyMarkup = nameReplyDeleteMarkup)
+                        val a = waitText().first().text
+                        if (a == DELETEYES){
+                            deleteCurrentApp(findApp.bundle)
+                            sendMessage(onCommandChat.chat, "${findApp.appName} deleted", replyMarkup = ReplyKeyboardRemove(false))
+                            return@onMessageDataCallbackQuery
+                        }
+                        sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
                         return@onMessageDataCallbackQuery
                     }
                     editMessageText(
@@ -200,6 +208,14 @@ suspend fun replaceCurrentApp(app: App) = withContext(Dispatchers.IO){
     }
 }
 
+suspend fun deleteCurrentApp(bundle: String) = withContext(Dispatchers.IO){
+    try {
+        client.get("https://grey-source.herokuapp.com/delete?bundle=$bundle").body<App>()
+    } catch (e : Exception) {
+        println(e)
+    }
+}
+
 suspend fun getCurrentApp(bundle : String) = withContext(Dispatchers.IO){
     try {
         client.get("https://grey-source.herokuapp.com/apps?search=$bundle").body<App>()
@@ -290,12 +306,23 @@ class ConstValue{
         const val FBCLIENTSECRET = "Facebook appMarker"
         const val ALL = "all"
         const val DELETE = "delete"
+        const val DELETEYES = "Delete"
+        const val DELETENO = "Cancel"
         const val NEXT = "Пропустить"
         val nameReplyMarkup = ReplyKeyboardMarkup(
             matrix {
                 row {
                     +SimpleKeyboardButton(NEXT)
                 }
+            }
+        )
+        val nameReplyDeleteMarkup = ReplyKeyboardMarkup(
+            matrix {
+                row {
+                    +SimpleKeyboardButton(DELETEYES)
+                    +SimpleKeyboardButton(DELETENO)
+                }
+
             }
         )
     }
