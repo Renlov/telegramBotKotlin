@@ -22,6 +22,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import ConstValue.Companion.BUNDLE
 import ConstValue.Companion.DELETE
+import ConstValue.Companion.DELETENO
 import ConstValue.Companion.DELETEYES
 import ConstValue.Companion.FBAPPID
 import ConstValue.Companion.FBCLIENTSECRET
@@ -103,14 +104,17 @@ suspend fun main() {
                     val name = it.data
                     if (name == DELETE){
                         sendMessage(onCommandChat.chat, "Are delete ${findApp.appName}?", replyMarkup = nameReplyDeleteMarkup)
-                        val a = waitText().first().text
-                        if (a == DELETEYES){
+                        val isDelete = waitText().first().text
+
+                        if (isDelete == DELETEYES){
                             deleteCurrentApp(findApp.bundle)
                             sendMessage(onCommandChat.chat, "${findApp.appName} deleted", replyMarkup = ReplyKeyboardRemove(false))
                             return@onMessageDataCallbackQuery
-                        } else sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
 
-                        return@onMessageDataCallbackQuery
+                        }else if (isDelete== DELETENO) {
+                            sendMessage(onCommandChat.chat, "", replyMarkup = ReplyKeyboardRemove(false))
+                            return@onMessageDataCallbackQuery
+                        } else return@onMessageDataCallbackQuery
                     }
                     editMessageText(
                         it.message.withContent() ?: it.let {
