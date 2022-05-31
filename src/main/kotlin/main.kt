@@ -75,7 +75,9 @@ suspend fun main() {
                         "/add - to add app in database\n\n" +
                         "if bot asleep, open link in browser to wake up bot\n" +
                         "https://telegrambotgrey.herokuapp.com\n" +
-                        "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
+                        "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!\n"+
+                        "Первым делом нужно разбудить бота по ссылке, потом кинуть ему два раза /info, если ничего не пришло" +
+                        "тогда рестартани бота, это сверху пункт остановить и запустить"
                 )
             }
 
@@ -283,16 +285,28 @@ fun changeDataApp(source : String, param : String, app: App) : Unit = when(sourc
         app.appName = param
     }
     URL ->{
+        if(param == "null"){
+            app.source = null
+        } else
         app.source = param
     }
     APPSFLYER ->{
-        app.appsFlyer = param
+        if(param == "null"){
+            app.source = null
+        } else
+            app.source = param
     }
     FBAPPID ->{
-        app.fbAppId = param
+        if(param == "null"){
+            app.source = null
+        } else
+            app.source = param
     }
     FBCLIENTSECRET ->{
-        app.fbClientSecret = param
+        if(param == "null"){
+            app.source = null
+        } else
+            app.source = param
     }
     else ->{
     }
@@ -312,7 +326,6 @@ class ConstValue{
         const val APPSFLYER = "appsFlyer"
         const val FBAPPID = "Facebook appId"
         const val FBCLIENTSECRET = "Facebook appMarker"
-        const val ALL = "all"
         const val DELETE = "delete"
         const val DELETEYES = "Delete"
         const val DELETENO = "Cancel"
