@@ -292,21 +292,21 @@ fun changeDataApp(source : String, param : String, app: App) : Unit = when(sourc
     }
     APPSFLYER ->{
         if(param == "null"){
-            app.source = null
+            app.appsFlyer = null
         } else
-            app.source = param
+            app.appsFlyer = param
     }
     FBAPPID ->{
         if(param == "null"){
-            app.source = null
+            app.fbAppId = null
         } else
-            app.source = param
+            app.fbAppId = param
     }
     FBCLIENTSECRET ->{
         if(param == "null"){
-            app.source = null
+            app.fbClientSecret = null
         } else
-            app.source = param
+            app.fbClientSecret = param
     }
     else ->{
     }
