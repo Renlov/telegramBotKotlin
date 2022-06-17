@@ -73,7 +73,6 @@ suspend fun main() {
                 )
             }
             onCommand("apps") {component ->
-                if (this.isActive) return@onCommand
                 sendMessage(component.chat, "wait...(sometimes more 10 second)")
                 val apps = getApps()
                 println("${component.chat} ${component.chat.id.chatId}")
