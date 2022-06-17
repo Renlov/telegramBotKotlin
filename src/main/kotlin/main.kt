@@ -88,13 +88,16 @@ suspend fun main() {
                     )
                 )
                 val findApp: App = getCurrentApp(searchBundle.first().text) as App
+                println(findApp.toString())
                 bot.sendTextMessage(onCommandChat.chat, appToString(findApp), replyMarkup = inlineKeyboard {
                     row {
                         includePageButtons()
                     }
                 })
+                var name = ""
                 this.onMessageDataCallbackQuery {massageData ->
-                    val name = massageData.data
+                    name += massageData.data
+                    println(name)
                     bot.editMessageText(
                         massageData.message.withContent() ?: massageData.let { app ->
                             answer(app, "Unsupported message type :(")
@@ -104,11 +107,14 @@ suspend fun main() {
                         replyMarkup = inlineKeyboard {
                         }
                     )
-                    val changeData = waitText().first().text
-                    changeDataApp(name, changeData, findApp)
-                    replaceCurrentApp(findApp)
-                    bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
                 }
+                val changeData = waitText().first().text
+
+                changeDataApp(name, changeData, findApp)
+                replaceCurrentApp(findApp)
+                name.drop(name.length)
+
+                bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
             }
             onCommand("add") { massage ->
                 val arrayList = ArrayList<String?>()
