@@ -27,26 +27,21 @@ import ConstValue.Companion.NEXT
 import ConstValue.Companion.URL
 import ConstValue.Companion.nameReplyMarkup
 import com.benasher44.uuid.uuid4
-import dev.inmo.micro_utils.coroutines.runCatchingSafely
-import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.setWebhookInfoAndStartListenWebhooks
 import dev.inmo.tgbotapi.requests.webhook.SetWebhook
-import dev.inmo.tgbotapi.types.chat.Chat
-import dev.inmo.tgbotapi.types.chat.PrivateChat
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
-import java.math.BigInteger
 import kotlin.collections.ArrayList
 
 suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
     val subRoute = uuid4().toString()
-    val startedChats = mutableSetOf<Chat>()
+
     telegramBotWithBehaviour(System.getenv("KEYTELEGRAM"), scope = scope) {
         setWebhookInfoAndStartListenWebhooks(
             System.getenv("PORT").toInt(),
@@ -63,28 +58,10 @@ suspend fun main() {
         println(getMe())
 
         onUnhandledCommand {
-
-//            onCommand("start", initialFilter = { it.chat is PrivateChat && startedChats.add(it.chat) }){
-//                reply(it, "Hello, this is a gray department bot.\n" +
-//                                "In this chat you can add apps, search + correct data and find all apps\n\n" +
-//                                "You have this commands:\n" +
-//                                "/apps - find all apps\n" +
-//                                "/search - to find app information and correct data\n" +
-//                                "/put - to add app in database\n\n" +
-//                                "if bot asleep, open link in browser to wake up bot\n" +
-//                                "https://telegrambotgrey.herokuapp.com\n" +
-//                                "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
-//                    )
-//                println(it.chat)
-//                startedChats.forEach {chat ->
-//                    println(chat.id)
-//                }
-//            }
-
             println(it.chat.id)
-            onCommand("info") {
+            onCommand("info") { textComponent ->
                 sendMessage(
-                    it.chat, "Hello, this is a gray department bot.\n" +
+                    textComponent.chat, "Hello, this is a gray department bot.\n" +
                             "In this chat you can add apps, search + correct data and find all apps\n\n" +
                             "You have this commands:\n" +
                             "/apps - find all apps\n" +
@@ -95,11 +72,12 @@ suspend fun main() {
                             "АНЯ, если что-то сломала, не трогай больше ничего и напиши нам!"
                 )
             }
-            onCommand("apps") {
-                sendMessage(it.chat, "wait...(sometimes more 10 second)")
+            onCommand("apps") {component ->
+                sendMessage(component.chat, "wait...(sometimes more 10 second)")
                 val apps = getApps()
+                println("${component.chat} ${component.chat.id.chatId}")
                 apps.forEach { app ->
-                    bot.sendMessage(it.chat, appToString(app))
+                    bot.sendMessage(component.chat, appToString(app))
                 }
             }
             onCommand("search") { onCommandChat ->
@@ -115,11 +93,11 @@ suspend fun main() {
                         includePageButtons()
                     }
                 })
-                onMessageDataCallbackQuery {
-                    val name = it.data
+                onMessageDataCallbackQuery {massageData ->
+                    val name = massageData.data
                     editMessageText(
-                        it.message.withContent() ?: it.let {
-                            answer(it, "Unsupported message type :(")
+                        massageData.message.withContent() ?: massageData.let { app ->
+                            answer(app, "Unsupported message type :(")
                             return@onMessageDataCallbackQuery
                         },
                         "change $name on ${findApp.appName} app",
@@ -132,23 +110,23 @@ suspend fun main() {
                     sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
                 }
             }
-            onCommand("put") {
+            onCommand("put") { massage ->
                 val arrayList = ArrayList<String?>()
                 val bundle = waitText(
                     SendTextMessage(
-                        it.chat.id, "Bundle, like\ncom.opple.entel\nАНЯ, ЕГО НЕЛЬЗЯ БУДЕТ ПОМЕНЯТЬ!"
+                        massage.chat.id, "Bundle, like\ncom.opple.entel\nАНЯ, ЕГО НЕЛЬЗЯ БУДЕТ ПОМЕНЯТЬ!"
                     )
                 )
                 arrayList.add(bundle[0].text.lowercase().replace(" ", ""))
                 val name = waitText(
                     SendTextMessage(
-                        it.chat.id, "App name, like\nSoul of Apis"
+                        massage.chat.id, "App name, like\nSoul of Apis"
                     )
                 )
                 arrayList.add(name[0].text)
                 val link = waitText(
                     SendTextMessage(
-                        it.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
+                        massage.chat.id, "Url, like\nhttps://www.dssm.us/21006Db01", replyMarkup = nameReplyMarkup
                     )
                 ).first().text.takeIf { it != NEXT }
                 if (link != null) {
@@ -156,7 +134,7 @@ suspend fun main() {
                 } else arrayList.add(null)
                 val apps = waitText(
                     SendTextMessage(
-                        it.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
+                        massage.chat.id, "AppsFlyer, like\nmciwvaFyjHeFMHFokEfuLE", replyMarkup = nameReplyMarkup
                     )
                 ).first().text.takeIf { it != NEXT }
                 if (apps != null) {
@@ -164,7 +142,7 @@ suspend fun main() {
                 } else arrayList.add(null)
                 val deepLink = waitText(
                     SendTextMessage(
-                        it.chat.id, "Facebook appId, like\n1349989478796692", replyMarkup = nameReplyMarkup
+                        massage.chat.id, "Facebook appId, like\n1349989478796692", replyMarkup = nameReplyMarkup
                     )
                 ).first().text.takeIf { it != NEXT }
                 if (deepLink != null) {
@@ -173,19 +151,21 @@ suspend fun main() {
 
                 val appMarker = waitText(
                     SendTextMessage(
-                        it.chat.id, "Facebook appMarker, like\n599f0f527ce2d13678e170d47e2a6cf3", replyMarkup = nameReplyMarkup
+                        massage.chat.id, "Facebook appMarker, like\n599f0f527ce2d13678e170d47e2a6cf3", replyMarkup = nameReplyMarkup
                     )
                 ).first().text.takeIf { it != NEXT }
                 if (appMarker != null) {
                     arrayList.add(appMarker)
                 } else arrayList.add(null)
 
+                println(massage.chat.id)
+
 
                 val app = App(arrayList[0]!!, arrayList[1]!!, arrayList[2], arrayList[3], arrayList[4], arrayList[5])
                 postCurrentApp(app)
-                sendMessage(it.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
+                sendMessage(massage.chat, "Done\n${appToString(app)}", replyMarkup = ReplyKeyboardRemove(false))
             }
-        }
+        }.join()
     }
 
     scope.coroutineContext.job.join()
@@ -297,7 +277,6 @@ class ConstValue{
         const val APPSFLYER = "appsFlyer"
         const val FBAPPID = "Facebook appId"
         const val FBCLIENTSECRET = "Facebook appMarker"
-        const val ALL = "all"
         const val NEXT = "Пропустить"
         val nameReplyMarkup = ReplyKeyboardMarkup(
             matrix {
