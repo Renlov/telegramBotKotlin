@@ -61,7 +61,7 @@ suspend fun main() {
             println(it.chat.id)
             onCommand("info") { textComponent ->
                 sendMessage(
-                    textComponent.chat, "Hello, this is a gray department bot.\n" +
+                    textComponent.chat, "Hello, this is a gray1 department bot.\n" +
                             "In this chat you can add apps, search + correct data and find all apps\n\n" +
                             "You have this commands:\n" +
                             "/apps - find all apps\n" +
@@ -110,7 +110,7 @@ suspend fun main() {
                     sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
                 }
             }
-            onCommand("put") { massage ->
+            onCommand("add") { massage ->
                 val arrayList = ArrayList<String?>()
                 val bundle = waitText(
                     SendTextMessage(
