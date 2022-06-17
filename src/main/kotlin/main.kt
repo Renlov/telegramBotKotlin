@@ -93,7 +93,7 @@ suspend fun main() {
                         includePageButtons()
                     }
                 })
-                onMessageDataCallbackQuery {massageData ->
+                this.onMessageDataCallbackQuery {massageData ->
                     val name = massageData.data
                     bot.editMessageText(
                         massageData.message.withContent() ?: massageData.let { app ->
