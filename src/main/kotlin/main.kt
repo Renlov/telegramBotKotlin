@@ -95,7 +95,7 @@ suspend fun main() {
                 })
                 onMessageDataCallbackQuery {massageData ->
                     val name = massageData.data
-                    editMessageText(
+                    bot.editMessageText(
                         massageData.message.withContent() ?: massageData.let { app ->
                             answer(app, "Unsupported message type :(")
                             return@onMessageDataCallbackQuery
@@ -107,7 +107,7 @@ suspend fun main() {
                     val changeData = waitText().first().text
                     changeDataApp(name, changeData, findApp)
                     replaceCurrentApp(findApp)
-                    sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
+                    bot.sendMessage(onCommandChat.chat, "Done ${appToString(findApp)}")
                 }
             }
             onCommand("add") { massage ->
